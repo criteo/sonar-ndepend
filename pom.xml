@@ -89,7 +89,6 @@
     <dependency>
       <groupId>org.codehaus.sonar-plugins.visualstudio</groupId>
       <artifactId>sonar-visual-studio-plugin</artifactId>
-      <scope>provided</scope>
       <version>1.1</version>
     </dependency>
     <dependency>
@@ -134,8 +133,8 @@
             <configuration>
               <rules>
                 <requireFilesSize>
-                  <maxsize>60000</maxsize>
-                  <minsize>30000</minsize>
+                  <maxsize>80000</maxsize>
+                  <minsize>50000</minsize>
                   <files>
                     <file>${project.build.directory}/${project.build.finalName}.jar</file>
                   </files>
