@@ -63,7 +63,7 @@ public class NdprojCreator {
   private InputStream getRulesInputStream() throws FileSystemException {
     String rulesUrl = settings.getString(NdependConfig.NDEPEND_RULES_URL_KEY);
     InputStream in;
-    if (rulesUrl.trim().isEmpty()) {
+    if (rulesUrl == null || rulesUrl.trim().isEmpty()) {
       LOG.info("No rules configured. Using default rules");
       in = getClass()
           .getResourceAsStream(NdependRulesDefinition.RULES_RESOURCE);
