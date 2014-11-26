@@ -17,18 +17,6 @@
  */
 package org.sonar.plugins.ndepend.ndproj;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.VFS;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.sonar.api.config.Settings;
-import org.sonar.plugins.ndepend.NdependConfig;
-import org.sonar.plugins.ndepend.NdependQuery;
-import org.sonar.plugins.ndepend.QueryLoader;
-import org.sonar.plugins.ndepend.SlnParser;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -38,6 +26,19 @@ import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.HashSet;
+
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.VFS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonar.api.config.Settings;
+import org.sonar.plugins.ndepend.NdependConfig;
+import org.sonar.plugins.ndepend.NdependQuery;
+import org.sonar.plugins.ndepend.NdependRulesDefinition;
+import org.sonar.plugins.ndepend.QueryLoader;
+import org.sonar.plugins.ndepend.SlnParser;
 
 /**
  * Creator of '.ndproj' files.
@@ -64,7 +65,8 @@ public class NdprojCreator {
     InputStream in;
     if (rulesUrl.trim().isEmpty()) {
       LOG.info("No rules configured. Using default rules");
-      in = getClass().getResourceAsStream("rules.xml");
+      in = getClass()
+          .getResourceAsStream(NdependRulesDefinition.RULES_RESOURCE);
     } else {
       LOG.info("Loading rules from {}", rulesUrl);
       FileSystemManager vfs = VFS.getManager();
