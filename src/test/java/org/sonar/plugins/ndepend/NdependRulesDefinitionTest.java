@@ -17,21 +17,27 @@
  */
 package org.sonar.plugins.ndepend;
 
-import static org.fest.assertions.Assertions.assertThat;
-
-import java.util.List;
-
 import org.junit.Test;
+import org.sonar.api.config.Settings;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.api.server.rule.RulesDefinition.Repository;
 import org.sonar.api.server.rule.RulesDefinitionXmlLoader;
+
+import java.util.List;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class NdependRulesDefinitionTest {
 
   @Test
   public void test() {
     RulesDefinition.Context context = new RulesDefinition.Context();
-    NdependRulesDefinition definition = new NdependRulesDefinition(new RulesDefinitionXmlLoader());
+    Settings settings = mock(Settings.class);
+    NdependRulesDefinition definition = new NdependRulesDefinition(new RulesDefinitionXmlLoader(), settings);
+
+    when(settings.getString(NdependConfig.NDEPEND_RULES_URL_KEY)).thenReturn(" ");
 
     definition.define(context);
     Repository repo = context.repository(NdependConfig.REPOSITORY_KEY);
