@@ -74,13 +74,12 @@
       <scope>provided</scope>
       <version>${sonarqube.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-vfs2</artifactId>
-      <scope>provided</scope>
       <version>2.0</version>
     </dependency>
-
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
@@ -91,6 +90,7 @@
       <artifactId>sonar-visual-studio-plugin</artifactId>
       <version>1.1</version>
     </dependency>
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-project</artifactId>
@@ -133,8 +133,8 @@
             <configuration>
               <rules>
                 <requireFilesSize>
-                  <maxsize>80000</maxsize>
-                  <minsize>50000</minsize>
+                  <maxsize>2000000</maxsize>
+                  <minsize>500000</minsize>
                   <files>
                     <file>${project.build.directory}/${project.build.finalName}.jar</file>
                   </files>
