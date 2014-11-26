@@ -1,16 +1,14 @@
 language: java
 
-
 before_deploy:
   - cd $TRAVIS_BUILD_DIR
   - git fetch --tags
-
 
 deploy:
   provider: releases
   skip_cleanup: true
   api_key:
-    secure: Hze64QC7F5SSOVoufSIPtRWb+t6Pzzvx2kJgLtPJYUj87CKOXYzVHVqHuWsa50DPfed9knDnm5nOJawZAxleXG5VxSvBERvSyUNhjNUbDkKson1/TcCl12YM5FcyM2ocsLYe/mc59V3h9LZR2mHDqVj/incxwAIxV/MJIgu5PBg=
+    secure: beK+KQaHoaCpDpxwc+3pWwb0rEwERdYxeYnvOvcG1WZm52Pr0NVYHzbbuBWJfmj2YxQtKPn8Lp8TKVaFVOHK6agnSfIMEpsfhcsWVyROBnDDx3SL6CejiaGFBjql9SGNtNnskTSXjtoMoSHHu+UD32ROD6CQ1X7D3iRgc2Bk9zs=
   file: target/sonar-ndepend.jar
   on:
     repo: criteo/sonar-ndepend
