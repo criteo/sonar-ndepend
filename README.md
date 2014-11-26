@@ -1,5 +1,5 @@
 sonar-ndepend
-================
+=============
 
 [![Build Status](https://travis-ci.org/criteo/sonar-ndepend.svg?branch=master)](https://travis-ci.org/criteo/sonar-ndepend)
 
