@@ -34,7 +34,7 @@ public class NdprojWriterTest {
   @Test
   public void TestWriteTo() throws Exception {
     Writer writer = new StringWriter();
-    SolutionInfo solutionInfo = new SolutionInfo(Arrays.asList("a1", "a2"),
+    NdprojInfo solutionInfo = new NdprojInfo(Arrays.asList("a1", "a2"),
         Arrays.asList("f1", "f2"), Arrays.asList("d1", "d2"));
     NdependQuery query = new NdependQuery("name", "group", Scope.METHOD,
         "warnif count > 0 from m in JustMyCode.Methods");

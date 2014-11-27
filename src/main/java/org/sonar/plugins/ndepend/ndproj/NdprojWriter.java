@@ -17,9 +17,8 @@
  */
 package org.sonar.plugins.ndepend.ndproj;
 
-import java.io.File;
-import java.io.Writer;
-import java.util.Collection;
+import org.sonar.plugins.ndepend.NdependQuery;
+import org.w3c.dom.Document;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -29,8 +28,9 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.sonar.plugins.ndepend.NdependQuery;
-import org.w3c.dom.Document;
+import java.io.File;
+import java.io.Writer;
+import java.util.Collection;
 
 /**
  * Writes a '.ndproj' XML file using the rules from Sonar and the information
@@ -38,7 +38,7 @@ import org.w3c.dom.Document;
  */
 public class NdprojWriter {
 
-  private SolutionInfo ndprojSolutionInfo;
+  private NdprojInfo ndprojSolutionInfo;
   private Collection<NdependQuery> ndependQueries;
   private File outputDir;
 
@@ -49,8 +49,8 @@ public class NdprojWriter {
    * @param ndependQueries
    * @param outputDir
    */
-  public NdprojWriter(SolutionInfo ndprojSolutionInfo,
-      Collection<NdependQuery> ndependQueries, File outputDir) {
+  NdprojWriter(NdprojInfo ndprojSolutionInfo,
+    Collection<NdependQuery> ndependQueries, File outputDir) {
     this.ndprojSolutionInfo = ndprojSolutionInfo;
     this.ndependQueries = ndependQueries;
     this.outputDir = outputDir;

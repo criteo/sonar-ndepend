@@ -63,7 +63,7 @@ public class NdprojCreator {
   CsProjectParseError {
     File solutionFile = new File(
       settings.getString(NdependConfig.SOLUTION_PATH_PROPERTY_KEY));
-    SolutionInfo ndprojSolutionInfo = readSolutionInfo(solutionFile);
+    NdprojInfo ndprojSolutionInfo = readProjectInfo(solutionFile);
     Collection<NdependQuery> ndependQueries = readQueries();
     File outputDir = new File(fileSystem.baseDir().getAbsolutePath(),
         NdependConfig.NDEPEND_RESULTS_FOLDER);
@@ -81,20 +81,22 @@ public class NdprojCreator {
     return queryLoader.getQueries(reader);
   }
 
-  private static SolutionInfo readSolutionInfo(File solutionFile)
-    throws CsProjectParseError {
+  private NdprojInfo readProjectInfo(File solutionFile)
+    throws CsProjectParseError, IOException {
     SlnParser slnParser = new SlnParser();
     Collection<File> csprojs = slnParser.parse(solutionFile);
     HashSet<String> assemblyNames = new HashSet<String>();
     HashSet<String> dependencies = new HashSet<String>();
     HashSet<String> outputPaths = new HashSet<String>();
     for (File csprojFile : csprojs) {
-      CsProjectParser csProjectParser = new CsProjectParser();
-      CsProjectInfo csProjectInfo = csProjectParser.parse(csprojFile);
-      assemblyNames.add(csProjectInfo.getAssemblyName());
-      dependencies.addAll(csProjectInfo.getReferences());
-      outputPaths.addAll(csProjectInfo.getOutputPaths());
+      if (this.fileSystem.baseDir().getCanonicalPath().equals(csprojFile.getParentFile().getCanonicalPath())) {
+        CsProjectParser csProjectParser = new CsProjectParser();
+        CsProjectInfo csProjectInfo = csProjectParser.parse(csprojFile);
+        assemblyNames.add(csProjectInfo.getAssemblyName());
+        dependencies.addAll(csProjectInfo.getReferences());
+        outputPaths.addAll(csProjectInfo.getOutputPaths());
+      }
     }
-    return new SolutionInfo(assemblyNames, dependencies, outputPaths);
+    return new NdprojInfo(assemblyNames, dependencies, outputPaths);
   }
 }
