@@ -84,11 +84,17 @@ class NdprojXmlBuilder {
 
   public void addQueries(Collection<NdependQuery> ndependQueries) {
     Element queries = this.doc.createElement("Queries");
+    Element group = this.doc.createElement("Group");
+    group.setAttribute("Name", "Sonar");
+    group.setAttribute("Active", "True");
+    group.setAttribute("ShowInReport", "True");
+
     for (NdependQuery ndependQuery : ndependQueries) {
       QueryXmlSerializer querySerializer = new QueryXmlSerializer(this.doc);
       Node queryNode = querySerializer.serialize(ndependQuery);
-      queries.appendChild(queryNode);
+      group.appendChild(queryNode);
     }
+    queries.appendChild(group);
     this.root.appendChild(queries);
   }
 

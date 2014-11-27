@@ -56,7 +56,7 @@ public class NdprojXmlBuilderTest {
                 + "<Assemblies><Name>a1</Name><Name>a2</Name></Assemblies>"
                 + "<FrameworkAssemblies><Name>f1</Name><Name>f2</Name></FrameworkAssemblies>"
                 + "<Dirs><Dir>d1</Dir><Dir>d2</Dir></Dirs>"
-                + "<Queries><Query .*>.*</Query></Queries></NDepend>",
+                + "<Queries><Group .*><Query .*>.*</Query></Group></Queries></NDepend>",
             Pattern.MULTILINE | Pattern.DOTALL);
     assertThat(p.matcher(xml).matches()).overridingErrorMessage(
         "Wrong XML: " + xml).isTrue();

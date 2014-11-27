@@ -56,7 +56,7 @@ public class QueryXmlSerializer {
     node.setAttribute("DisplayList", "True");
 
     // We don't care about the Sum, Average, etc. columns.
-    node.setAttribute("DisplayStat", "True");
+    node.setAttribute("DisplayStat", "False");
     node.setAttribute("IsCriticalRule", "True");
     node.appendChild(document.createCDATASection(getData(query)));
     return node;
