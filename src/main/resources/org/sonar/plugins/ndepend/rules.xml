@@ -5,7 +5,7 @@
     <name><![CDATA[Method with too many parameters]]></name>
     <group>Code Quality</group>
     <scope>method</scope>
-    <code><![CDATA[ warnif count > 0 from method in JustMyCode.Methods where method.NbParameters > 8]]></code>
+    <code><![CDATA[ warnif count > 0 from m in JustMyCode.Methods where m.NbParameters > 8]]></code>
     <description><![CDATA[Methods with too many parameters]]></description>
   </rule>
   <rule>
@@ -14,7 +14,7 @@
     <name><![CDATA[Too many lines in method]]></name>
     <group>Code Quality</group>
     <scope>method</scope>
-    <code><![CDATA[ warnif count > 0 from method in JustMyCode.Methods where method.NbLinesOfCode > 150]]></code>
+    <code><![CDATA[ warnif count > 0 from m in JustMyCode.Methods where m.NbLinesOfCode > 150]]></code>
     <description><![CDATA[Methods that are longer than 150 characters]]></description>
   </rule>
 </rules>

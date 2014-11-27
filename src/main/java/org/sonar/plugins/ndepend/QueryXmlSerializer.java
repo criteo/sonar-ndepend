@@ -89,11 +89,11 @@ public class QueryXmlSerializer {
 
   private void checkQuerySelectsVariable(NdependQuery query) {
     String pattern = String
-        .format("from %s", getVariableName(query.getScope()));
+      .format("from %s ", getVariableName(query.getScope()));
     if (!query.getCode().contains(pattern)) {
       throw new IllegalArgumentException(String.format(
-          "Rule %s is invalid: it should contain '%s'", query.getKey(),
-          pattern));
+        "Rule %s is invalid: it should contain '%s'", query.getKey(),
+        pattern));
     }
   }
 
