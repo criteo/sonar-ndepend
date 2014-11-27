@@ -58,7 +58,7 @@ public class QueryXmlSerializerTest {
     NdependQuery query = new NdependQuery("name", "group", Scope.METHOD,
         "warnif count > 0 from invalid_variable in JustMyCode.Methods");
     thrown.expect(IllegalArgumentException.class);
-    Node node = serializer.serialize(query);
+    serializer.serialize(query);
   }
 
   private Document getEmptyDocument() throws ParserConfigurationException {
