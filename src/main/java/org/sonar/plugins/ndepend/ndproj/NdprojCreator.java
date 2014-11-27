@@ -17,13 +17,6 @@
  */
 package org.sonar.plugins.ndepend.ndproj;
 
-import org.sonar.api.config.Settings;
-import org.sonar.plugins.ndepend.NdependConfig;
-import org.sonar.plugins.ndepend.NdependQuery;
-import org.sonar.plugins.ndepend.NdependRulesFetcher;
-import org.sonar.plugins.ndepend.QueryLoader;
-import org.sonar.plugins.ndepend.SlnParser;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -34,19 +27,29 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.sonar.api.batch.fs.FileSystem;
+import org.sonar.api.config.Settings;
+import org.sonar.plugins.ndepend.NdependConfig;
+import org.sonar.plugins.ndepend.NdependQuery;
+import org.sonar.plugins.ndepend.NdependRulesFetcher;
+import org.sonar.plugins.ndepend.QueryLoader;
+import org.sonar.plugins.ndepend.SlnParser;
+
 /**
  * Creator of '.ndproj' files.
  */
 public class NdprojCreator {
   private final Settings settings;
+  private FileSystem fileSystem;
 
   /**
    * Constructor.
    *
    * @param settings
    */
-  public NdprojCreator(Settings settings) {
+  public NdprojCreator(Settings settings, FileSystem fileSystem) {
     this.settings = settings;
+    this.fileSystem = fileSystem;
   }
 
   /**
@@ -62,8 +65,10 @@ public class NdprojCreator {
       settings.getString(NdependConfig.SOLUTION_PATH_PROPERTY_KEY));
     SolutionInfo ndprojSolutionInfo = readSolutionInfo(solutionFile);
     Collection<NdependQuery> ndependQueries = readQueries();
+    File outputDir = new File(fileSystem.baseDir().getAbsolutePath(),
+        NdependConfig.NDEPEND_RESULTS_FOLDER);
     NdprojWriter ndprojWriter = new NdprojWriter(ndprojSolutionInfo,
-      ndependQueries);
+      ndependQueries, outputDir);
     Writer writer = new FileWriter(ndprojFile);
     ndprojWriter.writeTo(writer);
   }

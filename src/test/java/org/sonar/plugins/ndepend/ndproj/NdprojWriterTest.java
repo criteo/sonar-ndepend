@@ -19,6 +19,7 @@ package org.sonar.plugins.ndepend.ndproj;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+import java.io.File;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Arrays;
@@ -37,12 +38,13 @@ public class NdprojWriterTest {
         Arrays.asList("f1", "f2"), Arrays.asList("d1", "d2"));
     NdependQuery query = new NdependQuery("name", "group", Scope.METHOD,
         "warnif count > 0 from m in JustMyCode.Methods");
-    new NdprojWriter(solutionInfo, Arrays.asList(query)).writeTo(writer);
+    new NdprojWriter(solutionInfo, Arrays.asList(query), new File("output"))
+        .writeTo(writer);
 
     String xml = writer.toString();
     Pattern p = Pattern
         .compile(
-            ".*<NDepend.*<Assemblies>.*<FrameworkAssemblies>.*<Dirs>.*<Queries>.*</NDepend>.*",
+            ".*<NDepend.*<OutputDir.*<Assemblies>.*<FrameworkAssemblies>.*<Dirs>.*<Queries>.*</NDepend>.*",
             Pattern.MULTILINE | Pattern.DOTALL);
     assertThat(p.matcher(xml).matches()).overridingErrorMessage(
         "Wrong XML: " + xml).isTrue();

@@ -19,6 +19,7 @@ package org.sonar.plugins.ndepend.ndproj;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+import java.io.File;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -39,6 +40,7 @@ public class NdprojXmlBuilderTest {
   @Test
   public void testBuild() throws Exception {
     NdprojXmlBuilder builder = new NdprojXmlBuilder();
+    builder.addOutputDir(new File("outputDir"));
     builder.addAssemblies(Arrays.asList("a1", "a2"));
     builder.addFrameworkAssemblies(Arrays.asList("f1", "f2"));
     builder.addDirs(Arrays.asList("d1", "d2"));
@@ -50,7 +52,8 @@ public class NdprojXmlBuilderTest {
     String xml = toXmlString(doc);
     Pattern p = Pattern
         .compile(
-            ".*<NDepend AppName=\"default\"><Assemblies><Name>a1</Name><Name>a2</Name></Assemblies>"
+            ".*<NDepend AppName=\"default\"><OutputDir KeepXmlFiles=\"True\">.*outputDir</OutputDir>"
+                + "<Assemblies><Name>a1</Name><Name>a2</Name></Assemblies>"
                 + "<FrameworkAssemblies><Name>f1</Name><Name>f2</Name></FrameworkAssemblies>"
                 + "<Dirs><Dir>d1</Dir><Dir>d2</Dir></Dirs>"
                 + "<Queries><Query .*>.*</Query></Queries></NDepend>",

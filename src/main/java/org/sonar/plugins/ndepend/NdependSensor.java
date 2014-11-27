@@ -38,6 +38,7 @@ import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandException;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.plugins.ndepend.ndproj.CsProjectParseError;
+import org.sonar.plugins.ndepend.NdependConfig;
 import org.sonar.plugins.ndepend.ndproj.NdprojCreator;
 
 public class NdependSensor implements Sensor {
@@ -62,7 +63,7 @@ public class NdependSensor implements Sensor {
     LOG.debug("Executing NDepend sensor...");
 
     File ndprojFile = getNdProjFile(context.fileSystem());
-    NdprojCreator creator = new NdprojCreator(settings);
+    NdprojCreator creator = new NdprojCreator(settings, fileSystem);
     try {
       creator.create(ndprojFile);
     } catch (IOException e) {

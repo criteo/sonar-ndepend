@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 package org.sonar.plugins.ndepend.ndproj;
+
+import java.io.File;
 import java.util.Collection;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -53,6 +55,13 @@ class NdprojXmlBuilder {
     this.root = this.doc.createElement("NDepend");
     this.root.setAttribute("AppName", "default");
     this.doc.appendChild(this.root);
+  }
+
+  public void addOutputDir(File outputDir) {
+    Element outputDirElement = this.doc.createElement("OutputDir");
+    outputDirElement.setAttribute("KeepXmlFiles", "True");
+    outputDirElement.setTextContent(outputDir.getAbsolutePath());
+    this.root.appendChild(outputDirElement);
   }
 
   public void addAssemblies(Collection<String> assemblyNames) {

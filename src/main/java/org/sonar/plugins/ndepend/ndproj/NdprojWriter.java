@@ -17,6 +17,7 @@
  */
 package org.sonar.plugins.ndepend.ndproj;
 
+import java.io.File;
 import java.io.Writer;
 import java.util.Collection;
 
@@ -39,17 +40,20 @@ public class NdprojWriter {
 
   private SolutionInfo ndprojSolutionInfo;
   private Collection<NdependQuery> ndependQueries;
+  private File outputDir;
 
   /**
    * Creates a writer of a '.ndproj' file.
    *
    * @param ndprojSolutionInfo
    * @param ndependQueries
+   * @param outputDir
    */
   public NdprojWriter(SolutionInfo ndprojSolutionInfo,
-      Collection<NdependQuery> ndependQueries) {
+      Collection<NdependQuery> ndependQueries, File outputDir) {
     this.ndprojSolutionInfo = ndprojSolutionInfo;
     this.ndependQueries = ndependQueries;
+    this.outputDir = outputDir;
   }
 
   /**
@@ -62,6 +66,7 @@ public class NdprojWriter {
 
   private Document buildNdprojXml() {
     NdprojXmlBuilder xmlBuilder = new NdprojXmlBuilder();
+    xmlBuilder.addOutputDir(outputDir);
     xmlBuilder.addAssemblies(this.ndprojSolutionInfo.getAssemblies());
     xmlBuilder.addFrameworkAssemblies(this.ndprojSolutionInfo
       .getFrameworkAssemblies());
