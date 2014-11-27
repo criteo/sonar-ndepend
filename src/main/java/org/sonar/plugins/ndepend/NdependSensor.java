@@ -83,13 +83,17 @@ public class NdependSensor implements Sensor {
     }
 
     String ndependPath = settings
-        .getString(NdependConfig.NDEPEND_PATH_PROPERTY_KEY);
+      .getString(NdependConfig.NDEPEND_PATH_PROPERTY_KEY);
+    try {
+      Command cmd = Command.create(ndependPath)
+        .addArgument(ndprojFile.getCanonicalPath())
+        .addArgument("/PersistHistoricAnalysisResult");
 
-    Command cmd = Command.create(ndependPath)
-          .addArgument("/PersistHistoricAnalysisResult")
-          .addArgument(ndprojFile.getAbsolutePath());
-    CommandExecutor.create().execute(cmd, TIMEOUT);
-    analyzeResults(context);
+      CommandExecutor.create().execute(cmd, TIMEOUT);
+      analyzeResults(context);
+    } catch (IOException e) {
+      throw new IOError(e);
+    }
   }
 
   @Override
