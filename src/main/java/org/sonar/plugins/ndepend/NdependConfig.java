@@ -33,10 +33,6 @@ public class NdependConfig {
 
   public static final String CATEGORY = "Ndepend";
 
-  /**
-   * The ndepend result file should be in #{fileSystem}/ndepend/CodeRuleResult.xml,
-   * e.g. .sonar/project/ndepend/CodeRuleResult.xml
-   */
-  public static final String NDEPEND_RESULTS_FILENAME = "CodeRuleResult.xml";
+  public static final String NDEPEND_RESULTS_FILENAME = "XmlFilesUsedToBuildReport/CodeRuleResult.xml";
   public static final String NDEPEND_RESULTS_FOLDER = "ndepend";
 }
