@@ -71,6 +71,7 @@ public class NdprojCreator {
       ndependQueries, outputDir);
     Writer writer = new FileWriter(ndprojFile);
     ndprojWriter.writeTo(writer);
+    writer.close();
   }
 
   private Collection<NdependQuery> readQueries() throws IOException {
