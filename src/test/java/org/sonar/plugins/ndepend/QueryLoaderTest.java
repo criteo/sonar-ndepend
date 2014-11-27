@@ -41,10 +41,10 @@ public class QueryLoaderTest {
     QueryLoader loader = new QueryLoader();
     List<NdependQuery> queries = loader.getQueries(new InputStreamReader(stream));
 
-    assertThat(queries.size()).isEqualTo(2);
-    assertThat(queries.get(0).getScope()).isEqualTo(Scope.METHOD);
-    assertThat(queries.get(0).getKey()).isEqualTo("MethodWithTooManyParameters");
-    assertThat(queries.get(1).getKey()).isEqualTo("MethodTooLong");
+    assertThat(queries.size()).isEqualTo(122);
+    assertThat(queries.get(0).getScope()).isEqualTo(Scope.TYPE);
+    assertThat(queries.get(0).getKey()).isEqualTo("TypesTooBigCritical");
+    assertThat(queries.get(1).getKey()).isEqualTo("MethodsTooComplexCritical");
   }
 
   @Test

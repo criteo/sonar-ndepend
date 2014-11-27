@@ -29,6 +29,7 @@ public class NdependQuery {
    * The 'scope' of a query (e.g. what it applies to).
    */
   public enum Scope {
+    FIELD,
     METHOD,
     TYPE
   }
