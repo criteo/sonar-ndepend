@@ -18,6 +18,12 @@
 
 package org.sonar.plugins.ndepend;
 
+import org.sonar.api.issue.Issue;
+
+import org.sonar.api.rule.RuleKey;
+import org.sonar.api.issue.Issuable;
+import org.sonar.api.component.ResourcePerspectives;
+
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
@@ -48,10 +54,12 @@ public class NdependSensor implements Sensor {
   private static final long TIMEOUT = TimeUnit.MINUTES.toMillis(10);
   private final Settings settings;
   private final FileSystem fileSystem;
+  private final ResourcePerspectives perspectives;
 
-  public NdependSensor(Settings settings, FileSystem fileSystem) {
+  public NdependSensor(Settings settings, FileSystem fileSystem, ResourcePerspectives perspectives) {
     this.settings = settings;
     this.fileSystem = fileSystem;
+    this.perspectives = perspectives;
   }
 
   private File getNdProjFile(FileSystem filesystem) {
@@ -63,9 +71,11 @@ public class NdependSensor implements Sensor {
     LOG.debug("Executing NDepend sensor...");
 
     File ndprojFile = getNdProjFile(context.fileSystem());
-    NdprojCreator creator = new NdprojCreator(settings, fileSystem);
+    NdprojCreator creator = new NdprojCreator(settings, context.fileSystem());
     try {
-      creator.create(ndprojFile);
+      if (!creator.create(ndprojFile)) {
+        return;
+      }
     } catch (IOException e) {
       throw new IOError(e);
     } catch (CsProjectParseError e) {
@@ -74,15 +84,12 @@ public class NdependSensor implements Sensor {
 
     String ndependPath = settings
         .getString(NdependConfig.NDEPEND_PATH_PROPERTY_KEY);
+
     Command cmd = Command.create(ndependPath)
-        .addArgument("/PersistHistoricAnalysisResult")
-        .addArgument(ndprojFile.getAbsolutePath());
-    try {
-      CommandExecutor.create().execute(cmd, TIMEOUT);
-      analyzeResults(context);
-    } catch (CommandException e) {
-      throw new IOError(e);
-    }
+          .addArgument("/PersistHistoricAnalysisResult")
+          .addArgument(ndprojFile.getAbsolutePath());
+    CommandExecutor.create().execute(cmd, TIMEOUT);
+    analyzeResults(context);
   }
 
   @Override
@@ -106,12 +113,23 @@ public class NdependSensor implements Sensor {
     }
 
     for (NdependIssue issue : issues) {
-      Resource r = null;
-      InputFile file = fileSystem.inputFile(fileSystem.predicates().is(
-          new File(issue.getFile())));
-      DefaultIssueBuilder b = new DefaultIssueBuilder();
-      context.addIssue(b.onFile(file).atLine(issue.getLine())
-          .message(issue.getMessage()).withKey(issue.getRuleKey()).build());
+      InputFile file;
+      try {
+        file = fileSystem.inputFile(fileSystem.predicates().hasAbsolutePath(issue.getFile().getCanonicalPath()));
+        if (file == null) {
+          LOG.error("Cannot find the following file in input files: {}", issue.getFile());
+          continue;
+        }
+        Issuable issuable = this.perspectives.as(Issuable.class, org.sonar.api.resources.File.create(file.relativePath()));
+        Issue sonarIssue = issuable.newIssueBuilder()
+          .line(issue.getLine())
+          .message(issue.getMessage())
+          .ruleKey(RuleKey.of(NdependConfig.REPOSITORY_KEY, issue.getRuleKey()))
+          .build();
+        issuable.addIssue(sonarIssue);
+      } catch (IOException e) {
+        LOG.error("Error computing path of {}", issue.getFile(), e);
+      }
     }
   }
 }

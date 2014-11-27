@@ -17,6 +17,16 @@
  */
 package org.sonar.plugins.ndepend.ndproj;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonar.api.batch.fs.FileSystem;
+import org.sonar.api.config.Settings;
+import org.sonar.plugins.ndepend.NdependConfig;
+import org.sonar.plugins.ndepend.NdependQuery;
+import org.sonar.plugins.ndepend.NdependRulesFetcher;
+import org.sonar.plugins.ndepend.QueryLoader;
+import org.sonar.plugins.ndepend.SlnParser;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -27,29 +37,23 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.sonar.api.batch.fs.FileSystem;
-import org.sonar.api.config.Settings;
-import org.sonar.plugins.ndepend.NdependConfig;
-import org.sonar.plugins.ndepend.NdependQuery;
-import org.sonar.plugins.ndepend.NdependRulesFetcher;
-import org.sonar.plugins.ndepend.QueryLoader;
-import org.sonar.plugins.ndepend.SlnParser;
-
 /**
  * Creator of '.ndproj' files.
  */
 public class NdprojCreator {
   private final Settings settings;
-  private FileSystem fileSystem;
+  private FileSystem filesystem;
+  private static final Logger LOG = LoggerFactory.getLogger(NdprojCreator.class);
 
   /**
    * Constructor.
    *
    * @param settings
    */
-  public NdprojCreator(Settings settings, FileSystem fileSystem) {
+
+  public NdprojCreator(Settings settings, FileSystem fs) {
     this.settings = settings;
-    this.fileSystem = fileSystem;
+    this.filesystem = fs;
   }
 
   /**
@@ -59,23 +63,26 @@ public class NdprojCreator {
    * @param ndprojFile
    *          the file to generate
    */
-  public void create(File ndprojFile) throws IOException,
-  CsProjectParseError {
+  public boolean create(File ndprojFile) throws IOException,
+    CsProjectParseError {
     File solutionFile = new File(
       settings.getString(NdependConfig.SOLUTION_PATH_PROPERTY_KEY));
     NdprojInfo ndprojSolutionInfo = readProjectInfo(solutionFile);
     Collection<NdependQuery> ndependQueries = readQueries();
-    File outputDir = new File(fileSystem.baseDir().getAbsolutePath(),
-        NdependConfig.NDEPEND_RESULTS_FOLDER);
+    if (ndprojSolutionInfo.getAssemblies().isEmpty()) {
+      return false;
+    }
+    File outputDir = new File(filesystem.baseDir().getAbsolutePath(),
+      NdependConfig.NDEPEND_RESULTS_FOLDER);
     NdprojWriter ndprojWriter = new NdprojWriter(ndprojSolutionInfo,
       ndependQueries, outputDir);
     Writer writer = new FileWriter(ndprojFile);
     ndprojWriter.writeTo(writer);
     writer.close();
+    return true;
   }
 
   private Collection<NdependQuery> readQueries() throws IOException {
-
     InputStream in = new NdependRulesFetcher(settings).get();
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     QueryLoader queryLoader = new QueryLoader();
@@ -90,7 +97,7 @@ public class NdprojCreator {
     HashSet<String> dependencies = new HashSet<String>();
     HashSet<String> outputPaths = new HashSet<String>();
     for (File csprojFile : csprojs) {
-      if (this.fileSystem.baseDir().getCanonicalPath().equals(csprojFile.getParentFile().getCanonicalPath())) {
+      if (this.filesystem.baseDir().getCanonicalPath().equals(csprojFile.getParentFile().getCanonicalPath())) {
         CsProjectParser csProjectParser = new CsProjectParser();
         CsProjectInfo csProjectInfo = csProjectParser.parse(csprojFile);
         assemblyNames.add(csProjectInfo.getAssemblyName());

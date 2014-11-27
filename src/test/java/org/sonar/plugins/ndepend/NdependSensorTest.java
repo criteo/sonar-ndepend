@@ -26,6 +26,7 @@ import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.internal.DefaultFileSystem;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.batch.sensor.internal.DefaultSensorDescriptor;
+import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.config.Settings;
 
 public class NdependSensorTest {
@@ -33,12 +34,13 @@ public class NdependSensorTest {
   @Test
   public void testSensorHasRightProperties() {
     SensorDescriptor descriptor = mock(DefaultSensorDescriptor.class);
+    ResourcePerspectives perspectives = mock(ResourcePerspectives.class);
 
     when(descriptor.createIssuesForRuleRepositories("cs-ndepend")).thenReturn(descriptor);
     when(descriptor.workOnFileTypes(InputFile.Type.MAIN, InputFile.Type.TEST)).thenReturn(
         descriptor);
     when(descriptor.workOnLanguages("cs")).thenReturn(descriptor);
-    new NdependSensor(new Settings(), new DefaultFileSystem()).describe(descriptor);
+    new NdependSensor(new Settings(), new DefaultFileSystem(), perspectives).describe(descriptor);
     verify(descriptor).workOnLanguages("cs");
     verify(descriptor).createIssuesForRuleRepositories("cs-ndepend");
     verify(descriptor).workOnFileTypes(InputFile.Type.MAIN, InputFile.Type.TEST);

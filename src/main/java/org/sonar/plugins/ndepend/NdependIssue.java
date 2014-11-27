@@ -19,14 +19,16 @@ package org.sonar.plugins.ndepend;
 
 import javax.annotation.Nullable;
 
+import java.io.File;
+
 public class NdependIssue {
 
   private final String ruleKey;
   private final String message;
-  private final String file;
+  private final File file;
   private final int line;
 
-  public NdependIssue(String ruleKey, String message, @Nullable String file, @Nullable int line) {
+  public NdependIssue(String ruleKey, String message, @Nullable File file, @Nullable int line) {
     this.ruleKey = ruleKey;
     this.message = message;
     this.file = file;
@@ -41,7 +43,7 @@ public class NdependIssue {
     return message;
   }
 
-  public String getFile() {
+  public File getFile() {
     return file;
   }
 

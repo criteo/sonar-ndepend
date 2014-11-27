@@ -23,6 +23,7 @@ import org.sonar.plugins.ndepend.ndproj.CsProjectParseError;
 import org.sonar.plugins.ndepend.ndproj.CsProjectParser;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -30,13 +31,15 @@ import static org.fest.assertions.Assertions.assertThat;
 public class CsProjectParserTest {
 
   @Test
-  public void parse() throws CsProjectParseError {
+  public void parse() throws CsProjectParseError, IOException {
     CsProjectParser parser = new CsProjectParser();
-    CsProjectInfo projectInfo = parser.parse(new File("src/test/resources/test.csproj"));
+    File projectFile = new File("src/test/resources/test.csproj");
+    String projectDir = projectFile.getParentFile().getCanonicalPath();
+    CsProjectInfo projectInfo = parser.parse(projectFile);
     assertThat(projectInfo.getAssemblyName()).isEqualTo("TestProject");
-    assertThat(new ArrayList<String>(projectInfo.getOutputPaths())).containsExactly(
-      "bin\\Debug\\",
-      "bin\\Release\\"
+    assertThat(new ArrayList<String>(projectInfo.getOutputPaths())).containsOnly(
+      new File(projectDir, "bin\\Debug\\").getCanonicalPath(),
+      new File(projectDir, "bin\\Release\\").getCanonicalPath()
       );
 
     assertThat(new ArrayList<String>(projectInfo.getReferences())).containsOnly(

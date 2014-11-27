@@ -76,12 +76,11 @@ public class NdependResultParser {
         Element row = (Element) rows.item(j);
         NodeList vals = row.getElementsByTagName("Val");
 
-        String filePath = ((Element) vals.item(0)).getTextContent();
+        File filePath = new File(((Element) vals.item(0)).getTextContent());
         int fileLine = Integer.parseInt(((Element) vals.item(1)).getTextContent());
         issueBuilder.add(new NdependIssue(ruleKey, ruleDesc, filePath, fileLine));
       }
     }
     return issueBuilder.build();
   }
-
 }

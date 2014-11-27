@@ -47,7 +47,7 @@ public class NdependResultParserTest {
     assertThat(sampleIssue.getRuleKey()).isEqualTo("Method with too many parameters");
     assertThat(sampleIssue.getMessage()).isEqualTo(
         "Code Quality \\ Method with too many parameters");
-    assertThat(sampleIssue.getFile()).contains("WorkflowPlayer.cs");
+    assertThat(sampleIssue.getFile().getPath()).contains("WorkflowPlayer.cs");
     assertThat(sampleIssue.getLine()).isEqualTo(69);
   }
 }

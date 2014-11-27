@@ -17,8 +17,14 @@
  */
 package org.sonar.plugins.ndepend.ndproj;
 
-import java.io.File;
-import java.util.HashSet;
+import com.google.common.base.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -27,13 +33,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import com.google.common.base.Function;
+import java.io.File;
+import java.util.HashSet;
 
 public class CsProjectParser {
 
@@ -91,7 +92,11 @@ public class CsProjectParser {
     try {
       final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(projectFile.getCanonicalPath());
       String assembly = nodeValue.apply((Node) assemblyNameXpath.evaluate(doc, XPathConstants.NODE));
-      HashSet<String> outputPaths = mapNodes((NodeList) outputPathXpath.evaluate(doc, XPathConstants.NODESET), nodeValue);
+      HashSet<String> outputPaths = new HashSet<String>();
+      for (String path : mapNodes((NodeList) outputPathXpath.evaluate(doc, XPathConstants.NODESET), nodeValue)) {
+        File outputFile = new File(projectFile.getParentFile().getCanonicalPath(), path);
+        outputPaths.add(outputFile.getCanonicalPath());
+      }
       HashSet<String> deps = mapNodes((NodeList) dependenciesXpath.evaluate(doc, XPathConstants.NODESET), referenceValue);
       return new CsProjectInfo(assembly, outputPaths, deps);
     } catch (Exception e) {
