@@ -39,7 +39,7 @@ class SolutionInfo {
    *          directories where are located the assemblies
    */
   public SolutionInfo(Collection<String> assemblies,
-      Collection<String> frameworkAssemblies, Collection<String> dirs) {
+    Collection<String> frameworkAssemblies, Collection<String> dirs) {
     this.assemblies = assemblies;
     this.frameworkAssemblies = frameworkAssemblies;
     this.dirs = dirs;

@@ -64,6 +64,5 @@ public class NdependPlugin extends SonarPlugin {
       .onlyOnQualifiers(Qualifiers.PROJECT)
       .build()
       );
-
   }
 }

@@ -17,10 +17,6 @@
  */
 package org.sonar.plugins.ndepend;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.junit.Test;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.internal.DefaultFileSystem;
@@ -28,6 +24,10 @@ import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.batch.sensor.internal.DefaultSensorDescriptor;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.config.Settings;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class NdependSensorTest {
 
@@ -38,7 +38,7 @@ public class NdependSensorTest {
 
     when(descriptor.createIssuesForRuleRepositories("cs-ndepend")).thenReturn(descriptor);
     when(descriptor.workOnFileTypes(InputFile.Type.MAIN, InputFile.Type.TEST)).thenReturn(
-        descriptor);
+      descriptor);
     when(descriptor.workOnLanguages("cs")).thenReturn(descriptor);
     new NdependSensor(new Settings(), new DefaultFileSystem(), perspectives).describe(descriptor);
     verify(descriptor).workOnLanguages("cs");

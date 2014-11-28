@@ -17,9 +17,9 @@
  */
 package org.sonar.plugins.ndepend;
 
-import java.util.List;
-
 import com.google.common.collect.ImmutableList;
+
+import java.util.List;
 
 public class NdependProvider {
 

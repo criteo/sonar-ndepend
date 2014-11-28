@@ -17,9 +17,13 @@
  */
 package org.sonar.plugins.ndepend;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,14 +32,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 public class NdependResultParser {
   private final Document doc;
@@ -49,7 +48,7 @@ public class NdependResultParser {
   }
 
   public static NdependResultParser fromFile(File file) throws SAXException, IOException,
-      ParserConfigurationException {
+  ParserConfigurationException {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     return new NdependResultParser(factory.newDocumentBuilder().parse(file));
   }
@@ -57,7 +56,7 @@ public class NdependResultParser {
   @VisibleForTesting
   NodeList getGroups() throws XPathExpressionException {
     return (NodeList) this.xpath.compile("/RuleResult/Group/Query").evaluate(this.doc,
-        XPathConstants.NODESET);
+      XPathConstants.NODESET);
   }
 
   @VisibleForTesting

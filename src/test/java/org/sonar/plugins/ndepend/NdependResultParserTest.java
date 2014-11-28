@@ -17,12 +17,12 @@
  */
 package org.sonar.plugins.ndepend;
 
-import static org.fest.assertions.Assertions.assertThat;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.List;
 
-import org.junit.Test;
+import static org.fest.assertions.Assertions.assertThat;
 
 public class NdependResultParserTest {
 
@@ -46,7 +46,7 @@ public class NdependResultParserTest {
     final NdependIssue sampleIssue = issues.get(0);
     assertThat(sampleIssue.getRuleKey()).isEqualTo("Method with too many parameters");
     assertThat(sampleIssue.getMessage()).isEqualTo(
-        "Code Quality \\ Method with too many parameters");
+      "Code Quality \\ Method with too many parameters");
     assertThat(sampleIssue.getFile().getPath()).contains("WorkflowPlayer.cs");
     assertThat(sampleIssue.getLine()).isEqualTo(69);
   }

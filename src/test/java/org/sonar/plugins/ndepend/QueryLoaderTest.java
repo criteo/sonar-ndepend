@@ -17,7 +17,10 @@
  */
 package org.sonar.plugins.ndepend;
 
-import static org.fest.assertions.Assertions.assertThat;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.sonar.plugins.ndepend.NdependQuery.Scope;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,10 +28,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.sonar.plugins.ndepend.NdependQuery.Scope;
+import static org.fest.assertions.Assertions.assertThat;
 
 public class QueryLoaderTest {
 
@@ -51,7 +51,7 @@ public class QueryLoaderTest {
   public void TestCanLoadValidRule() {
     QueryLoader loader = new QueryLoader();
     List<NdependQuery> queries = loader.getQueries(
-        getRuleXml("<key>n</key><group>g</group><scope>method</scope><code>c</code>"));
+      getRuleXml("<key>n</key><group>g</group><scope>method</scope><code>c</code>"));
 
     assertThat(queries.size()).isEqualTo(1);
     assertThat(queries.get(0).getScope()).isEqualTo(Scope.METHOD);

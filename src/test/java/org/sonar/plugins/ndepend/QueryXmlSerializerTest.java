@@ -17,17 +17,17 @@
  */
 package org.sonar.plugins.ndepend;
 
-import static org.fest.assertions.Assertions.assertThat;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.sonar.plugins.ndepend.NdependQuery.Scope;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 public class QueryXmlSerializerTest {
 
@@ -39,7 +39,7 @@ public class QueryXmlSerializerTest {
     Document doc = getEmptyDocument();
     QueryXmlSerializer serializer = new QueryXmlSerializer(doc);
     NdependQuery query = new NdependQuery("name", "group", Scope.METHOD,
-        "warnif count > 0 from m in JustMyCode.Methods");
+      "warnif count > 0 from m in JustMyCode.Methods");
     Node node = serializer.serialize(query);
     assertThat(node.getNodeName()).isEqualTo("Query");
 
@@ -56,7 +56,7 @@ public class QueryXmlSerializerTest {
     Document doc = getEmptyDocument();
     QueryXmlSerializer serializer = new QueryXmlSerializer(doc);
     NdependQuery query = new NdependQuery("name", "group", Scope.METHOD,
-        "warnif count > 0 from invalid_variable in JustMyCode.Methods");
+      "warnif count > 0 from invalid_variable in JustMyCode.Methods");
     thrown.expect(IllegalArgumentException.class);
     serializer.serialize(query);
   }

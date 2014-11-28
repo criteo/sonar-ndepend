@@ -64,7 +64,7 @@ public class NdprojCreator {
    *          the file to generate
    */
   public boolean create(File ndprojFile) throws IOException,
-    CsProjectParseError {
+  CsProjectParseError {
     File solutionFile = new File(
       settings.getString(NdependConfig.SOLUTION_PATH_PROPERTY_KEY));
     NdprojInfo ndprojSolutionInfo = readProjectInfo(solutionFile);

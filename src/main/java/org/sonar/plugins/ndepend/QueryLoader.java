@@ -17,19 +17,18 @@
  */
 package org.sonar.plugins.ndepend;
 
-import java.io.Reader;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.staxmate.SMInputFactory;
 import org.codehaus.staxmate.in.SMHierarchicCursor;
 import org.codehaus.staxmate.in.SMInputCursor;
 import org.sonar.plugins.ndepend.NdependQuery.Scope;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+
+import java.io.Reader;
 
 /**
  * Reads Ndepend queries from the rules.xml file.

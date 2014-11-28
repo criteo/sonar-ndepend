@@ -17,18 +17,18 @@
  */
 package org.sonar.plugins.ndepend.ndproj;
 
-import java.io.File;
-import java.util.Collection;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.sonar.plugins.ndepend.NdependQuery;
 import org.sonar.plugins.ndepend.QueryXmlSerializer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import java.io.File;
+import java.util.Collection;
 
 /**
  * Builder of an XML Document representing a '.ndproj' file.
@@ -55,13 +55,6 @@ class NdprojXmlBuilder {
     this.root = this.doc.createElement("NDepend");
     this.root.setAttribute("AppName", "default");
     this.doc.appendChild(this.root);
-  }
-
-  public void addOutputDir(File outputDir) {
-    Element outputDirElement = this.doc.createElement("OutputDir");
-    outputDirElement.setAttribute("KeepXmlFiles", "True");
-    outputDirElement.setTextContent(outputDir.getAbsolutePath());
-    this.root.appendChild(outputDirElement);
   }
 
   public void addAssemblies(Collection<String> assemblyNames) {
@@ -102,8 +95,15 @@ class NdprojXmlBuilder {
     return this.doc;
   }
 
+  public void addOutputDir(File outputDir) {
+    Element outputDirElement = this.doc.createElement("OutputDir");
+    outputDirElement.setAttribute("KeepXmlFiles", "True");
+    outputDirElement.setTextContent(outputDir.getAbsolutePath());
+    this.root.appendChild(outputDirElement);
+  }
+
   private void addAssemblies(String AssemblyKind,
-      Collection<String> assemblyNames) {
+    Collection<String> assemblyNames) {
     Element assemblies = this.doc.createElement(AssemblyKind);
     for (String assemblyName : assemblyNames) {
       Element name = this.doc.createElement("Name");

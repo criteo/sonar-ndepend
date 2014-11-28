@@ -18,9 +18,6 @@
 package org.sonar.plugins.ndepend.ndproj;
 
 import org.junit.Test;
-import org.sonar.plugins.ndepend.ndproj.CsProjectInfo;
-import org.sonar.plugins.ndepend.ndproj.CsProjectParseError;
-import org.sonar.plugins.ndepend.ndproj.CsProjectParser;
 
 import java.io.File;
 import java.io.IOException;

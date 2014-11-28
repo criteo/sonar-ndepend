@@ -18,18 +18,6 @@
 
 package org.sonar.plugins.ndepend;
 
-import org.sonar.api.issue.Issue;
-
-import org.sonar.api.rule.RuleKey;
-import org.sonar.api.issue.Issuable;
-import org.sonar.api.component.ResourcePerspectives;
-
-import java.io.File;
-import java.io.IOError;
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.fs.FileSystem;
@@ -37,20 +25,26 @@ import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
-import org.sonar.api.batch.sensor.issue.internal.DefaultIssueBuilder;
+import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.config.Settings;
-import org.sonar.api.resources.Resource;
+import org.sonar.api.issue.Issuable;
+import org.sonar.api.issue.Issue;
+import org.sonar.api.rule.RuleKey;
 import org.sonar.api.utils.command.Command;
-import org.sonar.api.utils.command.CommandException;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.plugins.ndepend.ndproj.CsProjectParseError;
-import org.sonar.plugins.ndepend.NdependConfig;
 import org.sonar.plugins.ndepend.ndproj.NdprojCreator;
+
+import java.io.File;
+import java.io.IOError;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class NdependSensor implements Sensor {
 
   private static final Logger LOG = LoggerFactory
-      .getLogger(NdependSensor.class);
+    .getLogger(NdependSensor.class);
   private static final long TIMEOUT = TimeUnit.MINUTES.toMillis(10);
   private final Settings settings;
   private final FileSystem fileSystem;
@@ -69,7 +63,6 @@ public class NdependSensor implements Sensor {
   @Override
   public void execute(SensorContext context) {
     LOG.debug("Executing NDepend sensor...");
-
     File ndprojFile = getNdProjFile(context.fileSystem());
     NdprojCreator creator = new NdprojCreator(settings, context.fileSystem());
     try {
@@ -100,17 +93,18 @@ public class NdependSensor implements Sensor {
   public void describe(SensorDescriptor descriptor) {
     LOG.debug("Describing NDepend sensor...");
     descriptor.createIssuesForRuleRepositories(NdependConfig.REPOSITORY_KEY)
-        .workOnFileTypes(InputFile.Type.MAIN, InputFile.Type.TEST)
-        .workOnLanguages(NdependConfig.LANGUAGE_KEY).name("NDepend");
+      .workOnFileTypes(InputFile.Type.MAIN, InputFile.Type.TEST)
+      .workOnLanguages(NdependConfig.LANGUAGE_KEY)
+      .name("NDepend");
   }
 
   private void analyzeResults(SensorContext context) {
     List<NdependIssue> issues;
     try {
       File resultsFolder = new File(fileSystem.baseDir().getAbsolutePath(),
-          NdependConfig.NDEPEND_RESULTS_FOLDER);
+        NdependConfig.NDEPEND_RESULTS_FOLDER);
       File resultsFile = new File(resultsFolder,
-          NdependConfig.NDEPEND_RESULTS_FILENAME);
+        NdependConfig.NDEPEND_RESULTS_FILENAME);
       issues = NdependResultParser.fromFile(resultsFile).parse();
     } catch (Exception e) {
       throw new RuntimeException(e);
