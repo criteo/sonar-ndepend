@@ -27,7 +27,7 @@ public class NdependConfig {
 
   public static final String REPOSITORY_KEY = "cs-ndepend";
 
-  public static final String SOLUTION_PATH_PROPERTY_KEY = "sonar.ndepend.solutionPath";
+  public static final String SOLUTION_PATH_PROPERTY_KEY = "sonar.ndepend.solutionFile";
   public static final String NDEPEND_PATH_PROPERTY_KEY = "sonar.ndepend.ndependPath";
   public static final String NDEPEND_RULES_URL_KEY = "sonar.ndepend.rulesUri";
 
