@@ -17,17 +17,22 @@
  */
 package org.sonar.plugins.ndepend;
 
+import static org.fest.assertions.Assertions.assertThat;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.sonar.plugins.ndepend.NdependQuery.Scope;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 public class QueryXmlSerializerTest {
 
@@ -59,6 +64,18 @@ public class QueryXmlSerializerTest {
       "warnif count > 0 from invalid_variable in JustMyCode.Methods");
     thrown.expect(IllegalArgumentException.class);
     serializer.serialize(query);
+  }
+
+  @Test
+  public void testAllDefaultQueriesAreSerializable() throws Exception {
+    Document doc = getEmptyDocument();
+    QueryXmlSerializer serializer = new QueryXmlSerializer(doc);
+    InputStream stream = getClass().getResourceAsStream(NdependRulesDefinition.RULES_RESOURCE);
+    Reader reader = new InputStreamReader(stream);
+    List<NdependQuery> queries = new QueryLoader().getQueries(reader);
+    for (NdependQuery query : queries) {
+      serializer.serialize(query);
+    }
   }
 
   private Document getEmptyDocument() throws ParserConfigurationException {
