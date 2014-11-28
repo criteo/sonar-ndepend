@@ -1,0 +1,13 @@
+<rules>
+  <% @rules.each do |rule| %>
+  <rule>
+    <key><%= rule.key %></key>
+    <severity><%= rule.severity %></severity>
+    <name><![CDATA[<%= rule.name %>]]></name>
+    <group><%= rule.group %></group>
+    <scope><%= rule.scope %></scope>
+    <code><![CDATA[ <%= rule.code %>]]></code>
+    <description><![CDATA[<%= rule.description%>]]></description>
+  </rule>
+  <% end %>
+</rules>
