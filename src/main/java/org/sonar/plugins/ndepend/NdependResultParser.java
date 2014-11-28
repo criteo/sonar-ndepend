@@ -61,7 +61,7 @@ public class NdependResultParser {
 
   @VisibleForTesting
   NodeList getGroupRows(Node groupNode) throws XPathExpressionException {
-    return (NodeList) this.xpath.compile("//Rows/Row").evaluate(groupNode, XPathConstants.NODESET);
+    return (NodeList) this.xpath.compile("Rows/Row").evaluate(groupNode, XPathConstants.NODESET);
   }
 
   public List<NdependIssue> parse() throws XPathExpressionException {

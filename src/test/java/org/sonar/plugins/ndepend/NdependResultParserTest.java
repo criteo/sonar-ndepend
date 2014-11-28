@@ -34,15 +34,15 @@ public class NdependResultParserTest {
   public void getGroupAndRows() throws Exception {
     final NdependResultParser parser = NdependResultParser.fromFile(getTestDoc());
 
-    assertThat(parser.getGroups().getLength()).isEqualTo(1);
-    assertThat(parser.getGroupRows(parser.getGroups().item(0)).getLength()).isEqualTo(5);
+    assertThat(parser.getGroups().getLength()).isEqualTo(2);
+    assertThat(parser.getGroupRows(parser.getGroups().item(0)).getLength()).isEqualTo(2);
   }
 
   @Test
   public void testParse() throws Exception {
     final NdependResultParser parser = NdependResultParser.fromFile(getTestDoc());
     final List<NdependIssue> issues = parser.parse();
-    assertThat(issues.size()).isEqualTo(5);
+    assertThat(issues.size()).isEqualTo(3);
     final NdependIssue sampleIssue = issues.get(0);
     assertThat(sampleIssue.getRuleKey()).isEqualTo("Method with too many parameters");
     assertThat(sampleIssue.getMessage()).isEqualTo(
