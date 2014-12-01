@@ -12,7 +12,29 @@ warnif count > 0 from t in JustMyCode.Types where
    // || t.NbILInstructions > 3000
    orderby t.NbLinesOfCode descending
 ]]></code>
-    <description><![CDATA[Types too big - critical]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in JustMyCode.Types where <br/>
+   t.NbLinesOfCode > 500 <br/>
+   // We've commented # IL Instructions, because with LINQ syntax, a few lines of code can compile to hundreds of IL instructions.<br/>
+   // || t.NbILInstructions > 3000<br/>
+   orderby t.NbLinesOfCode descending<br/>
+select new { t, t.NbLinesOfCode, t.NbILInstructions,<br/>
+                t.Methods, t.Fields }<br/>
+<br/>
+// Types where NbLinesOfCode > 500 are extremely complex <br/>
+// and should be split in a smaller group of types. <br/>
+// See the definition of the NbLinesOfCode metric here <br/>
+// http://www.ndepend.com/Metrics.aspx#NbLinesOfCode<br/>
+<br/>
+// In average, a line of code is compiled to around<br/>
+// 6 IL instructions. This is why the code metric<br/>
+// NbILInstructions is used here, in case the <br/>
+// code metric NbLinesOfCode is un-available because<br/>
+// of missing assemblies corresponding PDB files.<br/>
+// See the definition of the NbILInstructions metric here <br/>
+// http://www.ndepend.com/Metrics.aspx#NbILInstructions<br/>
+<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsTooComplexCritical</key>
@@ -27,7 +49,21 @@ warnif count > 0 from m in JustMyCode.Methods where
   orderby m.ILCyclomaticComplexity descending,
           m.ILNestingDepth descending
 ]]></code>
-    <description><![CDATA[Methods too complex - critical]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in JustMyCode.Methods where <br/>
+  m.ILCyclomaticComplexity > 40 && <br/>
+  m.ILNestingDepth > 5<br/>
+  orderby m.ILCyclomaticComplexity descending,<br/>
+          m.ILNestingDepth descending<br/>
+select new { m, m.ILCyclomaticComplexity, m.ILNestingDepth }<br/>
+<br/>
+// Methods with ILCyclomaticComplexity > 40 and ILNestingDepth  > 4<br/>
+// are really too complex and should be split <br/>
+// in smaller methods, or even types.<br/>
+// See the definition of the ILCyclomaticComplexity metric here <br/>
+// http://www.ndepend.com/Metrics.aspx#ILCC<br/>
+// See the definition of the ILNestingDepth metric here <br/>
+// http://www.NDepend.com/Metrics.aspx#ILNestingDepth<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsWithTooManyParametersCritical</key>
@@ -40,7 +76,22 @@ warnif count > 0 from m in JustMyCode.Methods where
   m.NbParameters > 8
   orderby m.NbParameters descending
 ]]></code>
-    <description><![CDATA[Methods with too many parameters - critical]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in JustMyCode.Methods where <br/>
+  m.NbParameters > 8<br/>
+  orderby m.NbParameters descending<br/>
+select new { m, m.NbParameters }<br/>
+<br/>
+// Methods with more than 8 parameters might be painful to call <br/>
+// and might degrade performance. You should prefer using <br/>
+// additional properties/fields to the declaring type to <br/>
+// handle numerous states. Another alternative is to provide <br/>
+// a class or structure dedicated to handle arguments passing <br/>
+// (for example see the class System.Diagnostics.ProcessStartInfo <br/>
+//  and the method System.Diagnostics.Process.Start(ProcessStartInfo))<br/>
+//  See the definition of the NbParameters metric here <br/>
+// http://www.ndepend.com/Metrics.aspx#NbParameters<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsTooBig</key>
@@ -56,7 +107,19 @@ warnif count > 0 from m in JustMyCode.Methods where
    orderby m.NbLinesOfCode descending,
            m.NbILInstructions descending
 ]]></code>
-    <description><![CDATA[Methods too big]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in JustMyCode.Methods where <br/>
+   m.NbLinesOfCode > 30<br/>
+   // We've commented # IL Instructions, because with LINQ syntax, a few lines of code can compile to hundreds of IL instructions.<br/>
+   // || m.NbILInstructions > 200<br/>
+   orderby m.NbLinesOfCode descending,<br/>
+           m.NbILInstructions descending<br/>
+select new { m, m.NbLinesOfCode, m.NbILInstructions }<br/>
+<br/>
+// Methods where NbLinesOfCode > 30 or NbILInstructions > 200<br/>
+// are extremely complex and should be split in smaller methods.<br/>
+// See the definition of the NbLinesOfCode metric here <br/>
+// http://www.ndepend.com/Metrics.aspx#NbLinesOfCode<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsTooComplex</key>
@@ -73,7 +136,27 @@ warnif count > 0 from m in JustMyCode.Methods where
           m.ILCyclomaticComplexity descending,
           m.ILNestingDepth descending
 ]]></code>
-    <description><![CDATA[Methods too complex]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in JustMyCode.Methods where <br/>
+  m.CyclomaticComplexity > 20 ||<br/>
+  m.ILCyclomaticComplexity > 40 ||<br/>
+  m.ILNestingDepth > 5<br/>
+  orderby m.CyclomaticComplexity descending,<br/>
+          m.ILCyclomaticComplexity descending,<br/>
+          m.ILNestingDepth descending<br/>
+select new { m, m.CyclomaticComplexity, <br/>
+                m.ILCyclomaticComplexity,<br/>
+                m.ILNestingDepth  }<br/>
+<br/>
+// Methods where CyclomaticComplexity > 20 <br/>
+// or ILCyclomaticComplexity > 40<br/>
+// or ILNestingDepth > 4<br/>
+// are hard to understand and maintain<br/>
+// and should be split in smaller methods.<br/>
+// See the definition of the complexity metrics here:<br/>
+// http://www.ndepend.com/Metrics.aspx#CC<br/>
+// http://www.ndepend.com/Metrics.aspx#ILCC<br/>
+// http://www.NDepend.com/Metrics.aspx#ILNestingDepth<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsPotentiallyPoorlyCommented</key>
@@ -87,7 +170,18 @@ warnif count > 0 from m in JustMyCode.Methods where
   m.NbLinesOfCode > 20
   orderby m.PercentageComment ascending
 ]]></code>
-    <description><![CDATA[Methods potentially poorly commented]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in JustMyCode.Methods where <br/>
+  m.PercentageComment < 20 && <br/>
+  m.NbLinesOfCode > 20  <br/>
+  orderby m.PercentageComment ascending<br/>
+select new { m, m.PercentageComment, m.NbLinesOfCode, m.NbLinesOfComment }<br/>
+<br/>
+// Methods where %Comment < 20 and that have <br/>
+// at least 20 lines of code might need to be more commented.<br/>
+// See the definition of the Comments metric here <br/>
+// http://www.ndepend.com/Metrics.aspx#PercentageComment<br/>
+// http://www.ndepend.com/Metrics.aspx#NbLinesOfComment <br/>]]></description>
   </rule>
   <rule>
     <key>MethodsWithTooManyParameters</key>
@@ -100,7 +194,21 @@ warnif count > 0 from m in JustMyCode.Methods where
   m.NbParameters > 5
   orderby m.NbParameters descending
 ]]></code>
-    <description><![CDATA[Methods with too many parameters]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in JustMyCode.Methods where <br/>
+  m.NbParameters > 5 <br/>
+  orderby m.NbParameters descending<br/>
+select new { m, m.NbParameters }<br/>
+<br/>
+// Methods where NbParameters > 5 might be painful to call <br/>
+// and might degrade performance. You should prefer using <br/>
+// additional properties/fields to the declaring type to <br/>
+// handle numerous states. Another alternative is to provide <br/>
+// a class or structure dedicated to handle arguments passing <br/>
+// (for example see the class System.Diagnostics.ProcessStartInfo <br/>
+// and the method System.Diagnostics.Process.Start(ProcessStartInfo))<br/>
+// See the definition of the NbParameters metric here <br/>
+// http://www.ndepend.com/Metrics.aspx#NbParameters<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsWithTooManyLocalVariables</key>
@@ -113,7 +221,17 @@ warnif count > 0 from m in JustMyCode.Methods where
   m.NbVariables > 15
   orderby m.NbVariables descending
 ]]></code>
-    <description><![CDATA[Methods with too many local variables]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in JustMyCode.Methods where <br/>
+  m.NbVariables > 15 <br/>
+  orderby m.NbVariables descending<br/>
+select new { m, m.NbVariables }<br/>
+<br/>
+// Methods where NbVariables > 8 are hard to understand and maintain.<br/>
+// Methods where NbVariables > 15 are extremely complex <br/>
+// and should be split in smaller methods.<br/>
+// See the definition of the Nbvariables metric here <br/>
+// http://www.ndepend.com/Metrics.aspx#Nbvariables<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsWithTooManyOverloads</key>
@@ -127,7 +245,22 @@ warnif count > 0 from m in JustMyCode.Methods where
   !m.IsOperator // Don't report operator overload
   orderby m.NbOverloads descending
 ]]></code>
-    <description><![CDATA[Methods with too many overloads]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in JustMyCode.Methods where <br/>
+  m.NbOverloads > 6 && <br/>
+  !m.IsOperator // Don't report operator overload<br/>
+  orderby m.NbOverloads descending<br/>
+select new { m, m.NbOverloads }<br/>
+<br/>
+// Methods where NbOverloads > 6 might <br/>
+// be a problem to maintain and provoke higher coupling <br/>
+// than necessary. <br/>
+// This might also reveal a potential misused of the <br/>
+// C# and VB.NET language that since C#3 and VB9 support <br/>
+// object initialization. This feature helps reducing the number <br/>
+// of constructors of a class.<br/>
+// See the definition of the NbOverloads metric here <br/>
+// http://www.ndepend.com/Metrics.aspx#NbOverloads<br/>]]></description>
   </rule>
   <rule>
     <key>TypesWithTooManyMethods</key>
@@ -148,7 +281,33 @@ warnif count > 0 from t in JustMyCode.Types
   where methods.Count() > 20
   orderby methods.Count() descending
 ]]></code>
-    <description><![CDATA[Types with too many methods]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in JustMyCode.Types <br/>
+<br/>
+  // Optimization: Fast discard of non-relevant types <br/>
+  where t.Methods.Count() > 20<br/>
+<br/>
+  // Don't match these methods<br/>
+  let methods = t.Methods.Where(<br/>
+       m => !(m.IsConstructor || m.IsClassConstructor ||<br/>
+              m.IsGeneratedByCompiler ||<br/>
+              m.IsPropertyGetter || m.IsPropertySetter ||<br/>
+              m.IsEventAdder || m.IsEventRemover))<br/>
+<br/>
+  where methods.Count() > 20 <br/>
+  orderby methods.Count() descending<br/>
+select new { t, <br/>
+             nbMethods = methods.Count(),<br/>
+             instanceMethods = methods.Where(m => !m.IsStatic), <br/>
+             staticMethods = methods.Where(m => m.IsStatic)}<br/>
+<br/>
+// Types where number of methods is greater than 20 <br/>
+// might be hard to understand and maintain <br/>
+// but there might be cases where it is relevant <br/>
+// to have a high number of methods. <br/>
+// For example, the System.Windows.Forms.DataGridView <br/>
+// standard class has more than 1000 methods.<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>TypesWithTooManyFields</key>
@@ -162,7 +321,19 @@ warnif count > 0 from t in JustMyCode.Types where
   !t.IsEnumeration
   orderby t.Fields.Count() descending
 ]]></code>
-    <description><![CDATA[Types with too many fields]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in JustMyCode.Types where <br/>
+  t.Fields.Count() > 20 && <br/>
+  !t.IsEnumeration <br/>
+  orderby t.Fields.Count() descending<br/>
+select new { t, t.InstanceFields, t.StaticFields, t.SizeOfInst }<br/>
+<br/>
+// Types where Fields.Count() > 20 and not IsEnumeration <br/>
+// might be hard to understand and maintain <br/>
+// but there might be cases where it is relevant <br/>
+// to have a high number of fields. <br/>
+// For example, the System.Windows.Forms.Control <br/>
+// standard class has more than 200 fields.<br/>]]></description>
   </rule>
   <rule>
     <key>TypesWithPoorCohesion</key>
@@ -177,7 +348,23 @@ warnif count > 0 from t in JustMyCode.Types where
   t.NbMethods >10
   orderby t.LCOM descending, t.LCOMHS descending
 ]]></code>
-    <description><![CDATA[Types with poor cohesion]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in JustMyCode.Types where <br/>
+  (t.LCOM > 0.8 || t.LCOMHS > 0.95) && <br/>
+  t.NbFields > 10 && <br/>
+  t.NbMethods >10 <br/>
+  orderby t.LCOM descending, t.LCOMHS descending<br/>
+select new { t, t.LCOM, t.LCOMHS, <br/>
+                t.NbMethods, t.NbFields }<br/>
+<br/>
+// Types where LCOM > 0.8 and NbFields > 10 <br/>
+// and NbMethods >10 might be problematic. <br/>
+// However, it is very hard to avoid such <br/>
+// non-cohesive types. The LCOMHS metric<br/>
+// is often considered as more efficient to <br/>
+// detect non-cohesive types.<br/>
+// See the definition of the LCOM metric here <br/>
+// http://www.ndepend.com/Metrics.aspx#LCOM<br/>]]></description>
   </rule>
   <rule>
     <key>FromNowAllMethodsAddedOrRefactoredShouldRespectBasicQualityPrinciples</key>
@@ -199,7 +386,32 @@ warnif count > 0 from m in JustMyCode.Methods where
    m.NbVariables > 8 ||             // http://www.ndepend.com/Metrics.aspx#NbVariables
    m.NbOverloads > 6 )
 ]]></code>
-    <description><![CDATA[From now, all methods added or refactored should respect basic quality principles]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in JustMyCode.Methods where<br/>
+<br/>
+// *** Only new or modified methods since Baseline for Comparison ***<br/>
+ (m.WasAdded() || m.CodeWasChanged()) &&<br/>
+ <br/>
+// Low Quality methods// Metrics' definitions<br/>
+(  m.NbLinesOfCode > 30 ||          // http://www.ndepend.com/Metrics.aspx#NbLinesOfCode<br/>
+   m.NbILInstructions > 200 ||      // http://www.ndepend.com/Metrics.aspx#NbILInstructions<br/>
+   m.CyclomaticComplexity > 20 ||   // http://www.ndepend.com/Metrics.aspx#CC<br/>
+   m.ILCyclomaticComplexity > 50 || // http://www.ndepend.com/Metrics.aspx#ILCC<br/>
+   m.ILNestingDepth > 4 ||          // http://www.ndepend.com/Metrics.aspx#ILNestingDepth<br/>
+   m.NbParameters > 5 ||            // http://www.ndepend.com/Metrics.aspx#NbParameters<br/>
+   m.NbVariables > 8 ||             // http://www.ndepend.com/Metrics.aspx#NbVariables<br/>
+   m.NbOverloads > 6 )<br/>
+select new { m, m.NbLinesOfCode, m.NbILInstructions, m.CyclomaticComplexity, <br/>
+             m.ILCyclomaticComplexity, m.ILNestingDepth, <br/>
+             m.NbParameters, m.NbVariables, m.NbOverloads }  // http://www.ndepend.com/Metrics.aspx#NbOverloads<br/>
+<br/>
+<br/>
+// This rule warns if a method with<br/>
+// low-quality has been added or refactored.<br/>
+// With NDepend and such rule, you can<br/>
+// Ensure Quality From Now! as explained here:<br/>
+// http://codebetter.com/blogs/patricksmacchia/archive/2008/01/01/ensure-the-quality-of-the-code-that-will-be-developed-this-year.aspx<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>FromNowAllTypesAddedOrRefactoredShouldRespectBasicQualityPrinciples</key>
@@ -224,7 +436,36 @@ t.NbLinesOfCode > 10 &&
    t.NbTypesUsed > 50
 )
 ]]></code>
-    <description><![CDATA[From now, all types added or refactored should respect basic quality principles]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in JustMyCode.Types where<br/>
+<br/>
+// *** Only match new or modified types since Baseline for Comparison ***<br/>
+(t.WasAdded() || t.CodeWasChanged()) &&<br/>
+<br/>
+// Eliminate interfaces, enumerations or types only with constant fields<br/>
+// by making sure we are matching type with code.<br/>
+t.NbLinesOfCode > 10 &&<br/>
+<br/>
+// Low Quality types     Metrics' definitions are available here:<br/>
+//     http://www.ndepend.com/Metrics.aspx#MetricsOnTypes<br/>
+(  // Types with too many methods<br/>
+   t.NbMethods > 20 ||<br/>
+<br/>
+   // Types with too many fields<br/>
+   t.NbFields > 20 ||<br/>
+<br/>
+   // Complex Types that use more than 50 other types<br/>
+   t.NbTypesUsed > 50<br/>
+)<br/>
+select new { t, t.Methods, t.Fields, t.TypesUsed }<br/>
+<br/>
+<br/>
+// This rule warns if a type with<br/>
+// low-quality has been added or refactored.<br/>
+// With NDepend and such rule, you can<br/>
+// Ensure Quality From Now! as explained here:<br/>
+// http://codebetter.com/blogs/patricksmacchia/archive/2008/01/01/ensure-the-quality-of-the-code-that-will-be-developed-this-year.aspx<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>FromNowAllTypesAddedOrRefactoredShouldBeCoveredByTests</key>
@@ -240,7 +481,22 @@ warnif count > 0 from t in JustMyCode.Types where
   t.PercentageCoverage < 100
   let methodsCulprit = t.Methods.Where(m => m.PercentageCoverage < 100)
 ]]></code>
-    <description><![CDATA[From now, all types added or refactored should be 100% covered by tests]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in JustMyCode.Types where<br/>
+<br/>
+  // Match methods new or modified since Baseline for Comparison...<br/>
+  (t.WasAdded() || t.CodeWasChanged()) &&<br/>
+<br/>
+  // ...that are not 100% covered by tests<br/>
+  t.PercentageCoverage < 100<br/>
+<br/>
+  let methodsCulprit = t.Methods.Where(m => m.PercentageCoverage < 100)<br/>
+<br/>
+select new { t, t.PercentageCoverage, methodsCulprit }<br/>
+<br/>
+// Having types 100% covered by tests is a good idea because <br/>
+// the small portion of code hard to cover, is also the <br/>
+// portion of code that is the most likely to contain bugs.<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidDecreasingCodeCoverageByTestsOfTypes</key>
@@ -257,7 +513,23 @@ from t in JustMyCode.Types where
   t.IsPresentInBothBuilds() &&
   t.PercentageCoverage < t.OlderVersion().PercentageCoverage
 ]]></code>
-    <description><![CDATA[Avoid decreasing code coverage by tests of types]]></description>
+    <description><![CDATA[<br/>
+// To visualize changes in code, right-click a matched type and select:<br/>
+//  - Compare older and newer versions of source file<br/>
+//  - Compare older and newer versions disassembled with Reflector<br/>
+<br/>
+warnif count > 0 <br/>
+from t in JustMyCode.Types where<br/>
+  t.IsPresentInBothBuilds() &&<br/>
+  t.PercentageCoverage < t.OlderVersion().PercentageCoverage<br/>
+<br/>
+select new { t,<br/>
+    OldCov = t.OlderVersion().PercentageCoverage,<br/>
+    NewCov = t.PercentageCoverage,<br/>
+    OldLoc = t.OlderVersion().NbLinesOfCode,<br/>
+    NewLoc = t.NbLinesOfCode,<br/>
+}<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>TypesThatUsedToBeCoveredButNotAnymore</key>
@@ -273,7 +545,14 @@ from t in JustMyCode.Types where
    t.PercentageCoverage < 100
 let culpritMethods = t.Methods.Where(m => m.PercentageCoverage < 100)
 ]]></code>
-    <description><![CDATA[Types that used to be 100% covered but not anymore]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0<br/>
+from t in JustMyCode.Types where <br/>
+   t.IsPresentInBothBuilds() &&<br/>
+   t.OlderVersion().PercentageCoverage == 100 &&<br/>
+   t.PercentageCoverage < 100<br/>
+let culpritMethods = t.Methods.Where(m => m.PercentageCoverage < 100)<br/>
+select new {t, t.PercentageCoverage, culpritMethods }<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidMakingComplexMethodsEvenMoreComplexsourceCc</key>
@@ -293,7 +572,27 @@ from m in JustMyCode.Methods where
 let oldCC = m.OlderVersion().CyclomaticComplexity
 where oldCC > 6 && m.CyclomaticComplexity > oldCC
 ]]></code>
-    <description><![CDATA[Avoid making complex methods even more complex (Source CC)]]></description>
+    <description><![CDATA[<br/>
+// To visualize changes in code, right-click a matched method and select:<br/>
+//  - Compare older and newer versions of source file<br/>
+//  - Compare older and newer versions disassembled with Reflector<br/>
+<br/>
+warnif count > 0 <br/>
+from m in JustMyCode.Methods where<br/>
+ !m.IsAbstract &&<br/>
+  m.IsPresentInBothBuilds() &&<br/>
+  m.CodeWasChanged()<br/>
+<br/>
+let oldCC = m.OlderVersion().CyclomaticComplexity<br/>
+where oldCC > 6 && m.CyclomaticComplexity > oldCC <br/>
+<br/>
+select new { m,<br/>
+    oldCC ,<br/>
+    newCC = m.CyclomaticComplexity ,<br/>
+    oldLoc = m.OlderVersion().NbLinesOfCode,<br/>
+    newLoc = m.NbLinesOfCode,<br/>
+}<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidMakingComplexMethodsEvenMoreComplexilCc</key>
@@ -313,7 +612,28 @@ from m in JustMyCode.Methods where
 let oldCC = m.OlderVersion().ILCyclomaticComplexity
 where oldCC > 10 && m.ILCyclomaticComplexity > oldCC
 ]]></code>
-    <description><![CDATA[Avoid making complex methods even more complex (IL CC)]]></description>
+    <description><![CDATA[<br/>
+// To visualize changes in code, right-click a matched method and select:<br/>
+//  - Compare older and newer versions of source file<br/>
+//  - Compare older and newer versions disassembled with Reflector<br/>
+<br/>
+warnif count > 0 <br/>
+from m in JustMyCode.Methods where<br/>
+ !m.IsAbstract &&<br/>
+  m.IsPresentInBothBuilds() &&<br/>
+  m.CodeWasChanged()<br/>
+<br/>
+let oldCC = m.OlderVersion().ILCyclomaticComplexity<br/>
+where oldCC > 10 && m.ILCyclomaticComplexity > oldCC <br/>
+<br/>
+select new { m,<br/>
+    oldCC ,<br/>
+    newCC = m.ILCyclomaticComplexity ,<br/>
+    oldLoc = m.OlderVersion().NbLinesOfCode,<br/>
+    newLoc = m.NbLinesOfCode,<br/>
+}<br/>
+<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidMakingLargeMethodsEvenLarger</key>
@@ -337,7 +657,30 @@ from m in JustMyCode.Methods where
 let oldLoc = m.OlderVersion().NbLinesOfCode
 where oldLoc > 15 && m.NbLinesOfCode > oldLoc
 ]]></code>
-    <description><![CDATA[Avoid making large methods even larger]]></description>
+    <description><![CDATA[<br/>
+// To visualize changes in code, right-click a matched method and select:<br/>
+//  - Compare older and newer versions of source file<br/>
+//  - Compare older and newer versions disassembled with Reflector<br/>
+<br/>
+warnif count > 0 <br/>
+from m in JustMyCode.Methods where<br/>
+ !m.IsAbstract &&<br/>
+  m.IsPresentInBothBuilds() &&<br/>
+  m.CodeWasChanged() &&<br/>
+ // Eliminate constructors from match, since they get larger<br/>
+ // as soons as some fields initialization are added.<br/>
+ !m.IsConstructor &&<br/>
+ !m.IsClassConstructor<br/>
+<br/>
+let oldLoc = m.OlderVersion().NbLinesOfCode<br/>
+where oldLoc > 15 && m.NbLinesOfCode > oldLoc<br/>
+<br/>
+select new { m,<br/>
+    oldLoc,<br/>
+    newLoc = m.NbLinesOfCode,<br/>
+}<br/>
+<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidAddingMethodsToATypeThatAlreadyHadManyMethods</key>
@@ -357,7 +700,25 @@ from t in JustMyCode.Types where
 let newMethods = t.Methods.Where(m => m.WasAdded())
 let removedMethods = t.OlderVersion().Methods.Where(m => m.WasRemoved())
 ]]></code>
-    <description><![CDATA[Avoid adding methods to a type that already had many methods]]></description>
+    <description><![CDATA[<br/>
+// To visualize changes in code, right-click a matched type and select:<br/>
+//  - Compare older and newer versions of source file<br/>
+//  - Compare older and newer versions disassembled with Reflector<br/>
+<br/>
+warnif count > 0 <br/>
+from t in JustMyCode.Types where<br/>
+  t.IsPresentInBothBuilds() &&<br/>
+  t.Methods.Count() > t.OlderVersion().Methods.Count() &&<br/>
+  t.OlderVersion().Methods.Count() > 10<br/>
+<br/>
+let newMethods = t.Methods.Where(m => m.WasAdded())<br/>
+let removedMethods = t.OlderVersion().Methods.Where(m => m.WasRemoved())<br/>
+<br/>
+select new { t,<br/>
+             oldNbMethods = t.OlderVersion().NbMethods,<br/>
+             newNbMethods = t.NbMethods,<br/>
+             newMethods,<br/>
+             removedMethods  }<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidTransformingAnImmutableTypeIntoAMutableOne</key>
@@ -377,7 +738,18 @@ from t in Application.Types where
   !t.IsStatic
 let culpritFields = t.Fields.Where(f => f.IsImmutable)
 ]]></code>
-    <description><![CDATA[Avoid transforming an immutable type into a mutable one]]></description>
+    <description><![CDATA[<br/>
+// Users of an immutable type often rely on the fact that the type is immutable.<br/>
+// If an immutable type becomes mutable, there are chances that this will break its users.<br/>
+warnif count > 0<br/>
+from t in Application.Types where<br/>
+   t.IsPresentInBothBuilds() &&<br/>
+   t.OlderVersion().IsImmutable &&<br/>
+  !t.IsImmutable && <br/>
+  // Don't take account of immutable types transformed into static types (not deemed as immtable)<br/>
+  !t.IsStatic<br/>
+let culpritFields = t.Fields.Where(f => f.IsImmutable)<br/>
+select new {t, culpritFields }<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidAddingInstanceFieldsToATypeThatAlreadyHadManyInstanceFields</key>
@@ -400,7 +772,28 @@ where
   oldNbInstanceFields.Count() > 6
 let newInstanceFields = t.InstanceFields.Where(f => f.WasAdded())
 ]]></code>
-    <description><![CDATA[Avoid adding instance fields to a type that already had many instance fields]]></description>
+    <description><![CDATA[<br/>
+// To visualize changes in code, right-click a matched type and select:<br/>
+//  - Compare older and newer versions of source file<br/>
+//  - Compare older and newer versions disassembled with Reflector<br/>
+<br/>
+warnif count > 0 <br/>
+from t in JustMyCode.Types where<br/>
+  t.IsPresentInBothBuilds() &&<br/>
+ !t.IsStatic<br/>
+<br/>
+let oldNbInstanceFields = t.OlderVersion().InstanceFields<br/>
+let newNbInstanceFields = t.InstanceFields<br/>
+where<br/>
+  newNbInstanceFields.Count() > oldNbInstanceFields .Count() &&<br/>
+  oldNbInstanceFields.Count() > 6<br/>
+<br/>
+let newInstanceFields = t.InstanceFields.Where(f => f.WasAdded())<br/>
+<br/>
+select new { t,<br/>
+             oldCount = oldNbInstanceFields.Count() ,<br/>
+             newCount = newNbInstanceFields.Count() ,<br/>
+             newInstanceFields }<br/>]]></description>
   </rule>
   <rule>
     <key>ClassShouldntBeTooDeepInInheritanceTree</key>
@@ -418,7 +811,26 @@ let baseClasses = t.BaseClasses.ExceptThirdParty()
 // not third-party libraries consumed design.
 where baseClasses.Count() >= 3
 ]]></code>
-    <description><![CDATA[Class shouldn't be too deep in inheritance tree]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in JustMyCode.Types <br/>
+where t.IsClass<br/>
+let baseClasses = t.BaseClasses.ExceptThirdParty()<br/>
+<br/>
+// Warn for classes with 3 or more base classes.<br/>
+// Notice that we don't count third-party classes <br/>
+// because this rule concerns your code design,<br/>
+// not third-party libraries consumed design.<br/>
+where baseClasses.Count() >= 3<br/>
+<br/>
+select new { t, baseClasses, <br/>
+                // The metric value DepthOfInheritance takes account<br/>
+                // of third-party base classes<br/>
+                t.DepthOfInheritance } <br/>
+<br/>
+// Branches too long in the derivation should be avoided.<br/>
+// See the definition of the DepthOfInheritance metric here <br/>
+// http://www.ndepend.com/Metrics.aspx#DIT<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>ClassWithNoDescendantShouldBeSealedIfPossible</key>
@@ -438,7 +850,18 @@ warnif count > 0 from t in JustMyCode.Types where
   //                    sub-classed by your clients.
   orderby t.NbLinesOfCode descending
 ]]></code>
-    <description><![CDATA[Class with no descendant should be sealed if possible]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in JustMyCode.Types where <br/>
+  t.IsClass && <br/>
+  t.NbChildren ==0 && <br/>
+ !t.IsSealed && <br/>
+ !t.IsStatic <br/>
+  // && !t.IsPublic <-- You might want to add this condition <br/>
+  //                    if you are developing a framework<br/>
+  //                    with classes that are intended to be <br/>
+  //                    sub-classed by your clients.<br/>
+  orderby t.NbLinesOfCode descending<br/>
+select new { t, t.NbLinesOfCode }<br/>]]></description>
   </rule>
   <rule>
     <key>OverridesOfMethodShouldCallBasemethod</key>
@@ -468,7 +891,32 @@ where  mBase.IsVirtual &&
 from mOverride in mBase.OverridesDirectDerived
 where !mOverride.IsUsing(mBase)
 ]]></code>
-    <description><![CDATA[Overrides of Method() should call base.Method()]]></description>
+    <description><![CDATA[<br/>
+// Overrides of Method() should refine the behavior of base.Method().<br/>
+// If base.Method() is not called, the base behavior is not refined but it is replaced.<br/>
+// Violations of this rule are a sign of design flaw,<br/>
+// especially if the design provides valid reasons <br/>
+// that advocates that the base behavior must be replaced and not refined.<br/>
+//<br/>
+// Discussions on this topic are available here:<br/>
+//  http://stackoverflow.com/questions/1107022/should-i-call-the-base-class-implementation-when-overriding-a-method-in-c-sharp<br/>
+//  http://stackoverflow.com/questions/2945147/make-sure-base-method-gets-called-in-c-sharp<br/>
+<br/>
+warnif count > 0<br/>
+from t in Types  // Take account of third-party types too<br/>
+<br/>
+// Bother only classes with descendant<br/>
+where t.IsClass && t.NbChildren > 0<br/>
+<br/>
+from mBase in t.InstanceMethods<br/>
+where  mBase.IsVirtual &&<br/>
+      !mBase.IsThirdParty &&<br/>
+      !mBase.IsAbstract && <br/>
+      !mBase.IsExplicitInterfaceImpl<br/>
+from mOverride in mBase.OverridesDirectDerived<br/>
+where !mOverride.IsUsing(mBase)<br/>
+select new { mOverride, shouldCall = mBase, definedInBaseClass = mBase.ParentType }<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>DoNotHideBaseClassMethods</key>
@@ -500,7 +948,37 @@ where m.IsNewSlot && !m.IsExplicitInterfaceImpl && !m.IsGeneratedByCompiler
 let baseMethodsHidden = lookup[m.Name].Where(m1 => m1 != m && t.DeriveFrom(m1.ParentType))
 where baseMethodsHidden.Count() > 0
 ]]></code>
-    <description><![CDATA[Do not hide base class methods]]></description>
+    <description><![CDATA[<br/>
+// To fix a violation of this rule, remove or rename the method, or change the parameter signature <br/>
+// so that the method does not hide the base method.<br/>
+<br/>
+// More on hiding vs. virtual usefulness here:<br/>
+//  http://www.artima.com/intv/nonvirtual.html<br/>
+//  http://blogs.msdn.com/b/ericlippert/archive/2008/05/21/method-hiding-apologia.aspx<br/>
+<br/>
+warnif count > 0<br/>
+<br/>
+// Define a lookup table indexing methods by their name including parameters signature.<br/>
+let lookup = Methods.Where(m => !m.IsConstructor && !m.IsStatic && !m.IsGeneratedByCompiler)<br/>
+                    .ToLookup(m1 => m1.Name)<br/>
+<br/>
+from t in Application.Types<br/>
+where !t.IsStatic && t.IsClass &&<br/>
+   // Discard classes deriving directly from System.Object<br/>
+   t.DepthOfInheritance > 1 <br/>
+where t.BaseClasses.Any()<br/>
+<br/>
+// For each methods not overriding any methods (new slot), <br/>
+// let's check if it hides by name some methods defined in base classe.<br/>
+from m in t.InstanceMethods<br/>
+where m.IsNewSlot && !m.IsExplicitInterfaceImpl && !m.IsGeneratedByCompiler<br/>
+<br/>
+// Notice how lookup is used to quickly retrieve methods with same name as m.<br/>
+// This makes the query 10 times faster than iterating each base methods to check their name.<br/>
+let baseMethodsHidden = lookup[m.Name].Where(m1 => m1 != m && t.DeriveFrom(m1.ParentType))<br/>
+<br/>
+where baseMethodsHidden.Count() > 0<br/>
+select new { m, baseMethodsHidden }<br/>]]></description>
   </rule>
   <rule>
     <key>AStatelessClassOrStructureMightBeTurnedIntoAStaticType</key>
@@ -524,7 +1002,29 @@ warnif count > 0 from t in JustMyCode.Types where
    ((t.IsClass && t.DepthOfDeriveFrom("System.Object".AllowNoMatch()) == 1) ||
      t.IsStructure)
 ]]></code>
-    <description><![CDATA[A stateless class or structure might be turned into a static type]]></description>
+    <description><![CDATA[<br/>
+// This rule indicates stateless types that might <br/>
+// eventually be turned into static classes.<br/>
+warnif count > 0 from t in JustMyCode.Types where<br/>
+  !t.IsStatic &&                  <br/>
+  !t.IsGeneric &&<br/>
+   t.InstanceFields.Count() == 0 &&<br/>
+<br/>
+   // Don't match:<br/>
+   // --> types that implement some interfaces.<br/>
+   t.NbInterfacesImplemented == 0 &&<br/>
+<br/>
+   // --> or classes that have sub-classes children.                            <br/>
+   t.NbChildren == 0 &&<br/>
+<br/>
+   // --> or classes that have a base class<br/>
+   ((t.IsClass && t.DepthOfDeriveFrom("System.Object".AllowNoMatch()) == 1) ||<br/>
+     t.IsStructure) <br/>
+<br/>
+   <br/>
+select t  <br/>
+<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>NonstaticClassesShouldBeInstantiatedOrTurnedToStatic</key>
@@ -548,7 +1048,24 @@ let ctorCalled = t.Constructors.FirstOrDefault(ctor => ctor.NbMethodsCallingMe >
 // match t if none of its constructors is called.
 where ctorCalled == null
 ]]></code>
-    <description><![CDATA[Non-static classes should be instantiated or turned to static]]></description>
+    <description><![CDATA[<br/>
+// Notice that classes only instantiated through reflection, like plug-in root classes<br/>
+// are matched by this rules.<br/>
+warnif count > 0<br/>
+from t in JustMyCode.Types<br/>
+where  t.IsClass &&<br/>
+    //!t.IsPublic &&   // if you are developing a framework, <br/>
+                       // you might not want to match public classes<br/>
+      !t.IsStatic && <br/>
+      !t.IsAttributeClass && // Attributes class are never seen as instantiated<br/>
+      !t.DeriveFrom("System.MarshalByRefObject".AllowNoMatch()) // Types instantiated through remoting infrastructure<br/>
+       <br/>
+// find the first constructor of t called<br/>
+let ctorCalled = t.Constructors.FirstOrDefault(ctor => ctor.NbMethodsCallingMe > 0)<br/>
+<br/>
+// match t if none of its constructors is called.<br/>
+where ctorCalled == null<br/>
+select new { t, t.Visibility }<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsShouldBeDeclaredStaticIfPossible</key>
@@ -588,7 +1105,44 @@ let methodsThatCanBeMadeStatic =
 from m in methodsThatCanBeMadeStatic
 let staticFieldsUsed = m.ParentType.StaticFields.UsedBy(m).Where(f => !f.IsGeneratedByCompiler)
 ]]></code>
-    <description><![CDATA[Methods should be declared static if possible]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0<br/>
+<br/>
+// When an instance method can be safely declared as static you should declare it as static.<br/>
+// Since it doesn't use any instance data and method of its type and base-types,<br/>
+// you should consider if such a method could be moved to a static utility class<br/>
+// or if it is strongly related enough to its current declaring type to stay in it.<br/>
+//<br/>
+// Turning an instance method into a static method is a micro performance optimization<br/>
+// since a static method is a bit cheaper to invoke than an instance method.<br/>
+<br/>
+from t in JustMyCode.Types.Where(t =><br/>
+   !t.IsStatic && !t.IsInterface &&<br/>
+   !t.IsEnumeration && !t.IsDelegate &&<br/>
+   !t.IsGeneratedByCompiler)<br/>
+<br/>
+let methodsThatCanBeMadeStatic = <br/>
+   from m in t.InstanceMethods<br/>
+<br/>
+   // An instance method can be turned to static if it is not virtual, <br/>
+   // not using the this reference and also, not using<br/>
+   // any of its class or base classes instance fields or instance methods.<br/>
+   where !m.IsAbstract && !m.IsVirtual &&<br/>
+         !m.AccessThis && !m.IsExplicitInterfaceImpl &&<br/>
+<br/>
+          // Optimization: Using FirstOrDefault() avoid to check all members, <br/>
+          //               as soon as one member is found<br/>
+          //               we know the method m cannot be made static.<br/>
+          m.MembersUsed.FirstOrDefault(<br/>
+              mUsed => !mUsed.IsStatic && <br/>
+                       (mUsed.ParentType == t || <br/>
+                        t.DeriveFrom(mUsed.ParentType))<br/>
+          ) == null <br/>
+   select m<br/>
+<br/>
+from m in methodsThatCanBeMadeStatic<br/>
+let staticFieldsUsed = m.ParentType.StaticFields.UsedBy(m).Where(f => !f.IsGeneratedByCompiler)<br/>
+select new { m, staticFieldsUsed }<br/>]]></description>
   </rule>
   <rule>
     <key>ConstructorShouldNotCallAVirtualMethods</key>
@@ -617,7 +1171,35 @@ let virtualMethodsCalled = from mCalled in ctor.MethodsCalled
                            select mCalled
 where virtualMethodsCalled.Count() > 0
 ]]></code>
-    <description><![CDATA[Constructor should not call a virtual methods]]></description>
+    <description><![CDATA[<br/>
+<br/>
+// Returns constructor of a non-sealed type calling virtual methods.<br/>
+// In such a situation, if a derived class overrides the method,<br/>
+// then the override method will be called before the derived constructor.<br/>
+// This makes the class fragile to derive from.<br/>
+//<br/>
+// Violations reported can be solved by re-designing object initialisation<br/>
+// or by marking the parent class as sealed, if possible.<br/>
+<br/>
+warnif count > 0<br/>
+from t in Application.Types where <br/>
+   t.IsClass &&<br/>
+  !t.IsGeneratedByCompiler &&<br/>
+  !t.IsSealed<br/>
+<br/>
+from ctor in t.Constructors <br/>
+let virtualMethodsCalled = from mCalled in ctor.MethodsCalled<br/>
+                           where mCalled.IsVirtual &&<br/>
+                                (mCalled.ParentType == t ||<br/>
+                                 t.DeriveFrom(mCalled.ParentType))<br/>
+                           select mCalled<br/>
+where virtualMethodsCalled.Count() > 0<br/>
+<br/>
+select new { ctor , <br/>
+             virtualMethodsCalled, <br/>
+             // If there is no derived type, it might be <br/>
+             // an opportunity to mark t as sealed.<br/>
+             t.DerivedTypes }<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidTheSingletonPattern</key>
@@ -635,7 +1217,28 @@ where t.Constructors.Where(ctor => !ctor.IsPrivate).Count() == 0
 let staticFieldInstances = t.StaticFields.WithFieldType(t)
 where staticFieldInstances.Count() == 1
 ]]></code>
-    <description><![CDATA[Avoid the Singleton pattern]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0<br/>
+from t in Application.Types<br/>
+where !t.IsStatic && !t.IsAbstract && (t.IsClass || t.IsStructure)<br/>
+<br/>
+// All ctors of a singleton are private<br/>
+where t.Constructors.Where(ctor => !ctor.IsPrivate).Count() == 0<br/>
+<br/>
+// A singleton contains one static field of its parent type, to reference the unique instance<br/>
+let staticFieldInstances = t.StaticFields.WithFieldType(t)<br/>
+where staticFieldInstances.Count() == 1<br/>
+select new { t, staticFieldInstance = staticFieldInstances.First() }<br/>
+<br/>
+// The Singleton pattern consists in syntactically enforcing that a class <br/>
+// has just one unique instance.<br/>
+// At first glance, this pattern looks appealing and it is widely used.<br/>
+// However, we discourage you from using singleton classes because experience<br/>
+// shows that singletons often result in less testable and less maintainable code.<br/>
+// More details available in these discussions:<br/>
+//  http://codebetter.com/patricksmacchia/2011/05/04/back-to-basics-usage-of-static-members/<br/>
+//  http://adamschepis.com/blog/2011/05/02/im-adam-and-im-a-recovering-singleton-addict/<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidEmptyInterfaces</key>
@@ -648,7 +1251,32 @@ warnif count > 0 from t in JustMyCode.Types where
   t.IsInterface &&
   t.NbMethods == 0
 ]]></code>
-    <description><![CDATA[Avoid empty interfaces]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in JustMyCode.Types where <br/>
+  t.IsInterface && <br/>
+  t.NbMethods == 0<br/>
+select new { t, t.TypesThatImplementMe }<br/>
+<br/>
+// Interfaces define members that provide a behavior <br/>
+// or usage contract. The functionality described by <br/>
+// the interface can be adopted by any type, <br/>
+// regardless of where the type appears in the <br/>
+// inheritance hierarchy. A type implements an <br/>
+// interface by providing implementations for the <br/>
+// interface's members. An empty interface does not <br/>
+// define any members, and as such, does not define <br/>
+// a contract that can be implemented.<br/>
+<br/>
+// If your design includes empty interfaces that <br/>
+// types are expected to implement, you are probably <br/>
+// using an interface as a marker, or a way of <br/>
+// identifying a group of types. If this identification <br/>
+// will occur at runtime, the correct way to accomplish<br/>
+// this is to use a custom attribute. Use the presence <br/>
+// or absence of the attribute, or the attribute's <br/>
+// properties, to identify the target types. If the <br/>
+// identification must occurs at compile time, then using <br/>
+// an empty interface is acceptable.<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidCustomDelegates</key>
@@ -681,7 +1309,38 @@ let replaceWith = resultTypeName == "Boolean" ?
       "Action" + signature3  :
       "Func" + signature3.Replace(">", "," + resultTypeName + ">")
 ]]></code>
-    <description><![CDATA[Avoid custom delegates]]></description>
+    <description><![CDATA[<br/>
+<br/>
+// Prefer using one of the standard generic delegate type in<br/>
+// Predicate<T> Func<T0,T1,..,TResult> Action<T0,T1,..> <br/>
+// instead of creating your own delegate type.<br/>
+// Not only the code using these custom delegates will become clearer,<br/>
+// but you'll be relieved from the maintenance of these delegate types.<br/>
+//<br/>
+// Notice that delegate that are consumed by DllImport extern methods<br/>
+// must not be converted, else this could provoke marshalling issues.<br/>
+<br/>
+warnif count > 0 <br/>
+from t in Application.Types where t.IsDelegate<br/>
+<br/>
+let invokeMethod = (from m in t.Methods where m.SimpleName == "Invoke" select m).Single()<br/>
+let signature1 = invokeMethod.Name.Substring(invokeMethod.SimpleName.Length, invokeMethod.Name.Length - invokeMethod.SimpleName.Length)<br/>
+<br/>
+// 'ref' and 'out' parameters canot be supported<br/>
+where !signature1.Contains("&")<br/>
+<br/>
+let signature2 = signature1.Replace("(","<").Replace(")",">")<br/>
+let signature3 = signature2 == "<>" ? "" : signature2<br/>
+let resultTypeName = invokeMethod.ReturnType == null ? "????" :<br/>
+                     invokeMethod.ReturnType.FullName == "System.Void" ? "" :<br/>
+                     invokeMethod.ReturnType.Name<br/>
+let replaceWith = resultTypeName == "Boolean" ?<br/>
+      "Predicate" + signature3 : resultTypeName == "" ?<br/>
+      "Action" + signature3  :<br/>
+      "Func" + signature3.Replace(">", "," + resultTypeName + ">")<br/>
+             <br/>
+<br/>
+select new { t, replaceWith }<br/>]]></description>
   </rule>
   <rule>
     <key>TypesWithDisposableInstanceFieldsMustBeDisposable</key>
@@ -701,7 +1360,22 @@ let instanceFieldsDisposable =
                                 f.FieldType.InterfacesImplemented.Intersect(iDisposables).Any())
 where instanceFieldsDisposable.Any()
 ]]></code>
-    <description><![CDATA[Types with disposable instance fields must be disposable]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0<br/>
+<br/>
+// Several IDisposable type can be found if several .NET Fx are referenced.<br/>
+let iDisposables = ThirdParty.Types.WithFullName("System.IDisposable")<br/>
+where iDisposables.Any() // in case the code base doesn't use at all System.IDisposable<br/>
+<br/>
+from t in Application.Types.Except(Application.Types.ThatImplementAny(iDisposables))<br/>
+where !t.IsGeneratedByCompiler <br/>
+<br/>
+let instanceFieldsDisposable = <br/>
+    t.InstanceFields.Where(f => f.FieldType != null &&<br/>
+                                f.FieldType.InterfacesImplemented.Intersect(iDisposables).Any())<br/>
+<br/>
+where instanceFieldsDisposable.Any()<br/>
+select new { t, instanceFieldsDisposable }<br/>]]></description>
   </rule>
   <rule>
     <key>ClassesThatAreCandidateToBeTurnedIntoStructures</key>
@@ -734,7 +1408,44 @@ warnif count > 0 from t in JustMyCode.Types where
   // Must have no base class
   t.DepthOfDeriveFrom("System.Object".AllowNoMatch()) == 1
 ]]></code>
-    <description><![CDATA[Classes that are candidate to be turned into structures]]></description>
+    <description><![CDATA[<br/>
+//<br/>
+// CAUTION: Before applying this rule, make sure to understand <br/>
+//          the implication of transforming a class into a structure.<br/>
+//          http://msdn.microsoft.com/en-us/library/aa664471(v=vs.71).aspx<br/>
+//<br/>
+// Int32, Double or Boolean are structures and not classes.<br/>
+// Structure are particularly suited to implement lightweight values.<br/>
+// Hence a class is candidate to be turned into a structure<br/>
+// when its instances are lightweight values.<br/>
+//<br/>
+warnif count > 0 from t in JustMyCode.Types where <br/>
+  t.IsClass &&<br/>
+ !t.IsGeneratedByCompiler &&<br/>
+ !t.IsStatic &&<br/>
+  t.SizeOfInst > 0 &&<br/>
+  t.SizeOfInst <= 16 &&   // Structure instance must not be too big, <br/>
+                          // else it degrades performance.<br/>
+<br/>
+  t.NbChildren == 0 &&    // Must not have children<br/>
+<br/>
+  // Must not implement interfaces to avoid boxing mismatch <br/>
+  // when structures implements interfaces.<br/>
+  t.InterfacesImplemented.Count() == 0 &&<br/>
+<br/>
+  // Must have no base class<br/>
+  t.DepthOfDeriveFrom("System.Object".AllowNoMatch()) == 1<br/>
+<br/>
+select new { t, t.SizeOfInst, t.InstanceFields } // Must derive directly from System.Object<br/>
+<br/>
+  // && t.IsSealed    <-- You might want to add this condition <br/>
+  //                      to restraint the set.<br/>
+  // && t.IsImmutable <-- Structures should be immutable type.<br/>
+  // && t.!IsPublic   <-- You might want to add this condition if <br/>
+  //                      you are developping a framework with classes <br/>
+  //                      that are intended to be sub-classed by <br/>
+  //                      your clients.<br/>
+  <br/>]]></description>
   </rule>
   <rule>
     <key>NestedTypesShouldNotBeVisible</key>
@@ -748,7 +1459,22 @@ warnif count > 0 from t in JustMyCode.Types where
  !t.IsGeneratedByCompiler &&
  !t.IsPrivate
 ]]></code>
-    <description><![CDATA[Nested types should not be visible]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in JustMyCode.Types where <br/>
+  t.IsNested && <br/>
+ !t.IsGeneratedByCompiler &&<br/>
+ !t.IsPrivate <br/>
+select new { t, t.NbLinesOfCode, t.Visibility } <br/>
+<br/>
+<br/>
+// A nested type is a type declared within the <br/>
+// scope of another type. Nested types are useful <br/>
+// for encapsulating private implementation details <br/>
+// of the containing type. Used for this purpose, <br/>
+// nested types should not be externally visible. <br/>
+// Do not use externally visible nested types for <br/>
+// logical grouping or to avoid name collisions; <br/>
+// instead, use namespaces.<br/>]]></description>
   </rule>
   <rule>
     <key>EmptyStaticConstructorCanBeDiscarded</key>
@@ -761,7 +1487,12 @@ warnif count > 0 from m in Application.Methods where
   m.IsClassConstructor &&
   m.NbLinesOfCode == 0
 ]]></code>
-    <description><![CDATA[Empty static constructor can be discarded]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in Application.Methods where <br/>
+  m.IsClassConstructor && <br/>
+  m.NbLinesOfCode == 0<br/>
+select m<br/>
+    <br/>]]></description>
   </rule>
   <rule>
     <key>InstancesSizeShouldntBeTooBig</key>
@@ -774,7 +1505,23 @@ warnif count > 0 from t in JustMyCode.Types where
   t.SizeOfInst > 64
   orderby t.SizeOfInst descending
 ]]></code>
-    <description><![CDATA[Instances size shouldn't be too big]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in JustMyCode.Types where <br/>
+  t.SizeOfInst > 64 <br/>
+  orderby t.SizeOfInst descending<br/>
+select new { t, t.SizeOfInst, t.InstanceFields }<br/>
+<br/>
+// Types where SizeOfInst > 64 might degrade performance <br/>
+// (depending on the number of instances created at runtime) <br/>
+// and might be hard to maintain. However it is not a rule <br/>
+// since sometime there is no alternative (the size of <br/>
+// instances of the System.Net.NetworkInformation.SystemIcmpV6Statistics <br/>
+// standard class is 2064 bytes).<br/>
+// Notice that a class with a large SizeOfInst value<br/>
+// doesn't necessarily have a lot of instance fields.<br/>
+// It might derive from a class with a large SizeOfInst value.<br/>
+// See the definition of the SizeOfInst metric here <br/>
+// http://www.ndepend.com/Metrics.aspx#SizeOfInst<br/>]]></description>
   </rule>
   <rule>
     <key>BoxingunboxingShouldBeAvoided</key>
@@ -787,7 +1534,13 @@ warnif percentage > 5 from m in Application.Methods where
   m.IsUsingBoxing ||
   m.IsUsingUnboxing
 ]]></code>
-    <description><![CDATA[Boxing/unboxing should be avoided]]></description>
+    <description><![CDATA[<br/>
+warnif percentage > 5 from m in Application.Methods where <br/>
+  m.IsUsingBoxing || <br/>
+  m.IsUsingUnboxing<br/>
+select new { m, m.NbLinesOfCode, m.IsUsingBoxing, m.IsUsingUnboxing } <br/>
+<br/>
+// Thanks to generics, boxing and unboxing should be rare.<br/>]]></description>
   </rule>
   <rule>
     <key>AttributeClassesShouldBeSealed</key>
@@ -802,7 +1555,23 @@ warnif count > 0 from t in Application.Types where
  !t.IsAbstract &&
   t.IsPublic
 ]]></code>
-    <description><![CDATA[Attribute classes should be sealed]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in Application.Types where <br/>
+  t.IsAttributeClass && <br/>
+ !t.IsSealed && <br/>
+ !t.IsAbstract && <br/>
+  t.IsPublic<br/>
+select new { t, t.NbLinesOfCode } <br/>
+<br/>
+// The .NET Framework class library provides methods <br/>
+// for retrieving custom attributes. By default, <br/>
+// these methods search the attribute inheritance <br/>
+// hierarchy; for example System.Attribute.GetCustomAttribute <br/>
+// searches for the specified attribute type, or any <br/>
+// attribute type that extends the specified attribute <br/>
+// type. Sealing the attribute eliminates the search <br/>
+// through the inheritance hierarchy, and can improve <br/>
+// performance.<br/>]]></description>
   </rule>
   <rule>
     <key>DontUseObsoleteTypesMethodsOrFields</key>
@@ -823,7 +1592,21 @@ let obsoleteTypesUsed = obsoleteTypes.UsedBy(m)
 let obsoleteMethodsUsed = m.MethodsCalled.Intersect(obsoleteMethods)
 let obsoleteFieldsUsed = obsoleteFields.UsedBy(m)
 ]]></code>
-    <description><![CDATA[Don't use obsolete types, methods or fields]]></description>
+    <description><![CDATA[   <br/>
+warnif count > 0<br/>
+let obsoleteTypes = Types.Where(t => t.IsObsolete)<br/>
+let obsoleteMethods = Methods.Where(m => m.IsObsolete).ToHashSet()<br/>
+let obsoleteFields = Fields.Where(f => f.IsObsolete)<br/>
+<br/>
+from m in JustMyCode.Methods.UsingAny(obsoleteTypes).Union(<br/>
+          JustMyCode.Methods.UsingAny(obsoleteMethods)).Union(<br/>
+          JustMyCode.Methods.UsingAny(obsoleteFields))<br/>
+let obsoleteTypesUsed = obsoleteTypes.UsedBy(m)<br/>
+<br/>
+// Optimization: MethodsCalled + Intersect() is faster than using obsoleteMethods.UsedBy()<br/>
+let obsoleteMethodsUsed = m.MethodsCalled.Intersect(obsoleteMethods)<br/>
+let obsoleteFieldsUsed = obsoleteFields.UsedBy(m)<br/>
+select new { m, obsoleteTypesUsed, obsoleteMethodsUsed, obsoleteFieldsUsed }<br/>]]></description>
   </rule>
   <rule>
     <key>DontForgetToImplementMethodsThatThrowNotimplementedexception</key>
@@ -836,7 +1619,11 @@ warnif count > 0
 from m in Application.Methods
 where m.CreateA("System.NotImplementedException".AllowNoMatch())
 ]]></code>
-    <description><![CDATA[Don't forget to implement methods that throw NotImplementedException]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0<br/>
+from m in Application.Methods<br/>
+where m.CreateA("System.NotImplementedException".AllowNoMatch())<br/>
+select m<br/>]]></description>
   </rule>
   <rule>
     <key>EqualsShouldBeOverriddenByTypesImplementingTheOperator</key>
@@ -852,7 +1639,15 @@ from m in Application.Methods where
 let equalsMethod = m.ParentType.InstanceMethods.Where(m0 => m0.Name == "Equals(Object)").SingleOrDefault()
 where equalsMethod == null
 ]]></code>
-    <description><![CDATA[Equals() should be overridden by types implementing the '==' operator]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0<br/>
+from m in Application.Methods where<br/>
+  m.IsOperator &&<br/>
+  m.SimpleName == "op_Equality"<br/>
+let equalsMethod = m.ParentType.InstanceMethods.Where(m0 => m0.Name == "Equals(Object)").SingleOrDefault()<br/>
+where equalsMethod == null<br/>
+select m<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>BrokenSerializableTypes</key>
@@ -883,7 +1678,41 @@ from t in Application.Types where
                            select f
   where addedInstanceField.Count() > 0 || removedInstanceField.Count() > 0
 ]]></code>
-    <description><![CDATA[Broken serializable types]]></description>
+    <description><![CDATA[<br/>
+// Find breaking changes in types marked with SerializableAttribute.<br/>
+warnif count > 0<br/>
+<br/>
+from t in Application.Types where<br/>
+<br/>
+  // Collect types tagged with SerializableAttribute<br/>
+  t.HasAttribute("System.SerializableAttribute".AllowNoMatch())  && <br/>
+ !t.IsDelegate &&<br/>
+  t.IsPresentInBothBuilds() &&<br/>
+  t.HasAttribute(t)<br/>
+<br/>
+  // Find newer and older versions of NonSerializedAttribute<br/>
+  let newNonSerializedAttribute = ThirdParty.Types.WithFullName("System.NonSerializedAttribute").SingleOrDefault()<br/>
+  let oldNonSerializedAttribute = newNonSerializedAttribute == null ? null : newNonSerializedAttribute.OlderVersion()<br/>
+<br/>
+  // Find added or removed fields not marked with NonSerializedAttribute<br/>
+  let addedInstanceField = from f in t.InstanceFields where <br/>
+                             f.WasAdded() && <br/>
+                             (newNonSerializedAttribute == null || !f.HasAttribute(newNonSerializedAttribute))<br/>
+                           select f<br/>
+  let removedInstanceField = from f in t.OlderVersion().InstanceFields where <br/>
+                             f.WasRemoved() && <br/>
+                             (oldNonSerializedAttribute == null || !f.HasAttribute(oldNonSerializedAttribute))<br/>
+                           select f<br/>
+  where addedInstanceField.Count() > 0 || removedInstanceField.Count() > 0<br/>
+<br/>
+select new { t, addedInstanceField, removedInstanceField }<br/>
+<br/>
+// From http://msdn.microsoft.com/library/system.serializableattribute.aspx :<br/>
+//   All the public and private fields in a type that are marked by the <br/>
+//   SerializableAttribute  are serialized by default, unless the type <br/>
+//   implements the ISerializable interface to  override the serialization process. <br/>
+//   The default serialization process excludes fields that are marked <br/>
+//   with the NonSerializedAttribute attribute.<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidTransformingImmutableTypesIntoMutableTypes</key>
@@ -906,7 +1735,28 @@ from t in Application.Types where
   t.OlderVersion().IsImmutable
 let mutableFields = from f in t.InstanceFields where !f.IsImmutable select f
 ]]></code>
-    <description><![CDATA[Avoid transforming immutable types into mutable types]]></description>
+    <description><![CDATA[<br/>
+<br/>
+// Immutability is a strong property on a type.<br/>
+// Breaking immutability can result in serious problem for an algorithm consummer<br/>
+// that has been written taking account of the type immutability.<br/>
+<br/>
+// To visualize changes in code, right-click a matched type and select:<br/>
+//  - Compare older and newer versions of source file<br/>
+//  - Compare older and newer versions disassembled with Reflector<br/>
+<br/>
+warnif count > 0 <br/>
+from t in Application.Types where<br/>
+  t.IsPresentInBothBuilds() &&<br/>
+ !t.IsStatic &&<br/>
+ !t.IsImmutable && <br/>
+  t.OlderVersion().IsImmutable<br/>
+<br/>
+let mutableFields = from f in t.InstanceFields where !f.IsImmutable select f<br/>
+<br/>
+select new { t, mutableFields }<br/>
+<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidChangingEnumerationsFlagsStatus</key>
@@ -928,7 +1778,24 @@ let isFlags = t.HasAttribute(newFlags)
 let wasFlags = t.OlderVersion().HasAttribute(oldFlags)
 where isFlags != wasFlags
 ]]></code>
-    <description><![CDATA[Avoid changing enumerations Flags status]]></description>
+    <description><![CDATA[<br/>
+<br/>
+// Being tagged with the Flags attribute is a strong property for an enumeration.<br/>
+// Changing the Flags status of an enumeration has significant impact for its client.<br/>
+warnif count > 0 <br/>
+<br/>
+let oldFlags = codeBase.OlderVersion().ThirdParty.Types.WithFullName("System.FlagsAttribute").SingleOrDefault()<br/>
+let newFlags = ThirdParty.Types.WithFullName("System.FlagsAttribute").SingleOrDefault()<br/>
+where oldFlags != null && newFlags != null<br/>
+<br/>
+from t in Application.Types where<br/>
+  t.IsEnumeration &&<br/>
+  t.IsPresentInBothBuilds() <br/>
+let isFlags = t.HasAttribute(newFlags)<br/>
+let wasFlags = t.OlderVersion().HasAttribute(oldFlags) <br/>
+where isFlags != wasFlags<br/>
+select new { t, isFlags, wasFlags }<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>ApiNewPubliclyVisibleTypes</key>
@@ -945,7 +1812,20 @@ where t.IsPubliclyVisible &&
      // ... or the type existed but was not publicly visible
        !t.WasAdded() && !t.OlderVersion().IsPubliclyVisible)
 ]]></code>
-    <description><![CDATA[API: New publicly visible types]]></description>
+    <description><![CDATA[<br/>
+// List types that are new in the public surface of your assemblies<br/>
+<br/>
+from t in Application.Types<br/>
+where t.IsPubliclyVisible && <br/>
+<br/>
+     // The type has been removed and its parent assembly hasn't been removed ...<br/>
+     ( (t.WasAdded() && !t.ParentAssembly.WasAdded()) ||<br/>
+<br/>
+     // ... or the type existed but was not publicly visible<br/>
+       !t.WasAdded() && !t.OlderVersion().IsPubliclyVisible)<br/>
+<br/>
+select new { t,<br/>
+             OldVisibility = (t.WasAdded() ? " " : t.OlderVersion().Visibility.ToString()) }<br/>]]></description>
   </rule>
   <rule>
     <key>ApiNewPubliclyVisibleMethods</key>
@@ -962,7 +1842,20 @@ where m.IsPubliclyVisible &&
      // ... or the t existed but was not publicly visible
        !m.WasAdded() && !m.OlderVersion().IsPubliclyVisible)
 ]]></code>
-    <description><![CDATA[API: New publicly visible methods]]></description>
+    <description><![CDATA[<br/>
+// List methods that are new in the public surface of your assemblies<br/>
+<br/>
+from m in Application.Methods<br/>
+where m.IsPubliclyVisible && <br/>
+<br/>
+     // The method has been removed and its parent assembly hasn'm been removed ...<br/>
+     ( (m.WasAdded() && !m.ParentType.WasAdded()) ||<br/>
+<br/>
+     // ... or the t existed but was not publicly visible<br/>
+       !m.WasAdded() && !m.OlderVersion().IsPubliclyVisible)<br/>
+<br/>
+select new { m,<br/>
+             OldVisibility = (m.WasAdded() ? " " : m.OlderVersion().Visibility.ToString()) }<br/>]]></description>
   </rule>
   <rule>
     <key>NewTypes</key>
@@ -975,7 +1868,12 @@ from t in Application.Types where
  !t.ParentNamespace.WasAdded() &&
   t.WasAdded()
 ]]></code>
-    <description><![CDATA[New types]]></description>
+    <description><![CDATA[<br/>
+from t in Application.Types where <br/>
+ !t.ParentNamespace.WasAdded() &&<br/>
+  t.WasAdded()<br/>
+select new { t, t.NbLinesOfCode }<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>TypesWhereCodeWasChanged</key>
@@ -994,7 +1892,20 @@ select new { t, t.NbLinesOfCode,
              delta = (int?) t.NbLinesOfCode - t.OlderVersion().NbLinesOfCode }
 /*from t in Application.Types where t.CodeWasChanged() && t.IsPresentInBothBuild
 ]]></code>
-    <description><![CDATA[Types where code was changed]]></description>
+    <description><![CDATA[<br/>
+// To visualize changes in code, right-click a matched type and select:<br/>
+//  - Compare older and newer versions of source file<br/>
+//  - Compare older and newer versions disassembled with Reflector<br/>
+<br/>
+from t in Application.Types where t.CodeWasChanged() <br/>
+//select new { t, t.NbLinesOfCode }<br/>
+select new { t, t.NbLinesOfCode, <br/>
+             oldNbLinesOfCode = t.OlderVersion().NbLinesOfCode ,<br/>
+             delta = (int?) t.NbLinesOfCode - t.OlderVersion().NbLinesOfCode } <br/>
+/*from t in Application.Types where t.CodeWasChanged() && t.IsPresentInBothBuild<br/>
+select new { t, t.NbLinesOfCode, <br/>
+             oldNbLinesOfCode = t.OlderVersion().NbLinesOfCode ,<br/>
+             delta = (int) t.NbLinesOfCode - t.OlderVersion().NbLinesOfCode }*/<br/>]]></description>
   </rule>
   <rule>
     <key>TypesDirectlyUsingOneOrSeveralTypesChanged</key>
@@ -1009,7 +1920,14 @@ from t in JustMyCode.Types.UsingAny(typesChanged) where
   !t.WasAdded()
 let typesChangedUsed = t.TypesUsed.Intersect(typesChanged)
 ]]></code>
-    <description><![CDATA[Types directly using one or several types changed]]></description>
+    <description><![CDATA[<br/>
+let typesChanged = Application.Types.Where(t => t.CodeWasChanged()).ToHashSet()<br/>
+<br/>
+from t in JustMyCode.Types.UsingAny(typesChanged) where<br/>
+  !t.CodeWasChanged() && <br/>
+  !t.WasAdded()<br/>
+let typesChangedUsed = t.TypesUsed.Intersect(typesChanged) <br/>
+select new { t, typesChangedUsed }<br/>]]></description>
   </rule>
   <rule>
     <key>NewMethods</key>
@@ -1022,7 +1940,12 @@ from m in Application.Methods where
  !m.ParentType.WasAdded() &&
   m.WasAdded()
 ]]></code>
-    <description><![CDATA[New methods]]></description>
+    <description><![CDATA[<br/>
+from m in Application.Methods where <br/>
+ !m.ParentType.WasAdded() &&<br/>
+  m.WasAdded()<br/>
+select new { m, m.NbLinesOfCode }<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsWhereCodeWasChanged</key>
@@ -1036,7 +1959,15 @@ from m in Application.Methods where
 //  - Compare older and newer versions disassembled with Reflector
 from m in Application.Methods where m.CodeWasChanged()
 ]]></code>
-    <description><![CDATA[Methods where code was changed]]></description>
+    <description><![CDATA[<br/>
+// To visualize changes in code, right-click a matched method and select:<br/>
+//  - Compare older and newer versions of source file<br/>
+//  - Compare older and newer versions disassembled with Reflector<br/>
+<br/>
+from m in Application.Methods where m.CodeWasChanged()<br/>
+select new { m, m.NbLinesOfCode, <br/>
+             oldNbLinesOfCode = m.OlderVersion().NbLinesOfCode ,<br/>
+             delta = (int?) m.NbLinesOfCode - m.OlderVersion().NbLinesOfCode }<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsDirectlyCallingOneOrSeveralMethodsChanged</key>
@@ -1051,7 +1982,14 @@ from m in JustMyCode.Methods.UsingAny(methodsChanged ) where
   !m.WasAdded()
 let methodsChangedCalled = m.MethodsCalled.Intersect(methodsChanged)
 ]]></code>
-    <description><![CDATA[Methods directly calling one or several methods changed]]></description>
+    <description><![CDATA[<br/>
+let methodsChanged = Application.Methods.Where(m => m.CodeWasChanged()).ToHashSet()<br/>
+<br/>
+from m in JustMyCode.Methods.UsingAny(methodsChanged ) where<br/>
+  !m.CodeWasChanged() && <br/>
+  !m.WasAdded()<br/>
+let methodsChangedCalled = m.MethodsCalled.Intersect(methodsChanged) <br/>
+select new { m, methodsChangedCalled }<br/>]]></description>
   </rule>
   <rule>
     <key>ThirdPartyTypesThatWereNotUsedAndThatAreNowUsed</key>
@@ -1062,7 +2000,10 @@ let methodsChangedCalled = m.MethodsCalled.Intersect(methodsChanged)
     <code><![CDATA[
 from t in ThirdParty.Types where t.IsUsedRecently()
 ]]></code>
-    <description><![CDATA[Third party types that were not used and that are now used]]></description>
+    <description><![CDATA[<br/>
+from t in ThirdParty.Types where t.IsUsedRecently()<br/>
+select new { t, t.Methods, t.Fields, t.TypesUsingMe }<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>ThirdPartyMethodsThatWereNotUsedAndThatAreNowUsed</key>
@@ -1075,7 +2016,11 @@ from m in ThirdParty.Methods where
   m.IsUsedRecently() &&
  !m.ParentType.IsUsedRecently()
 ]]></code>
-    <description><![CDATA[Third party methods that were not used and that are now used]]></description>
+    <description><![CDATA[<br/>
+from m in ThirdParty.Methods where <br/>
+  m.IsUsedRecently() &&<br/>
+ !m.ParentType.IsUsedRecently()<br/>
+select new { m, m.MethodsCallingMe }<br/>]]></description>
   </rule>
   <rule>
     <key>CrapMethodCodeMetric</key>
@@ -1098,7 +2043,23 @@ let CRAP = (CC * CC * uncov * uncov * uncov) + CC
 where CRAP != null && CRAP > 30
 orderby CRAP descending, m.NbLinesOfCode descending
 ]]></code>
-    <description><![CDATA[C.R.A.P method code metric]]></description>
+    <description><![CDATA[<br/>
+// Change Risk Analyzer and Predictor (i.e. CRAP) code metric<br/>
+// This code metric helps in pinpointing overly complex and untested code.<br/>
+// Reference: http://www.artima.com/weblogs/viewpost.jsp?thread=215899<br/>
+// Formula:   CRAP(m) = comp(m)^2 * (1 – cov(m)/100)^3 + comp(m)<br/>
+warnif count > 0<br/>
+from m in JustMyCode.Methods<br/>
+<br/>
+// Don't match too short methods<br/>
+where m.NbLinesOfCode > 10<br/>
+<br/>
+let CC = m.CyclomaticComplexity<br/>
+let uncov = (100 - m.PercentageCoverage) / 100f<br/>
+let CRAP = (CC * CC * uncov * uncov * uncov) + CC<br/>
+where CRAP != null && CRAP > 30<br/>
+orderby CRAP descending, m.NbLinesOfCode descending<br/>
+select new { m, CRAP, CC, uncoveredPercentage = uncov*100, m.NbLinesOfCode }<br/>]]></description>
   </rule>
   <rule>
     <key>ComplexMethodsPartiallyCoveredByTestsShouldBeCovered</key>
@@ -1122,7 +2083,26 @@ warnif count > 0 from m in JustMyCode.Methods
   orderby m.NbLinesOfCodeNotCovered ascending,
           m.NbLinesOfCode descending
 ]]></code>
-    <description><![CDATA[Complex methods partially covered by tests should be 100% covered]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in JustMyCode.Methods <br/>
+ where <br/>
+     // These metrics' definitions are available here: <br/>
+     // http://www.ndepend.com/Metrics.aspx#MetricsOnMethods<br/>
+     (  m.NbLinesOfCode > 30 || <br/>
+        m.ILCyclomaticComplexity > 50 || <br/>
+        m.ILNestingDepth > 4 || <br/>
+        m.NbVariables > 8) && <br/>
+<br/>
+     // Take care only of complex methods <br/>
+     // already partially covered, but not completely covered.<br/>
+     m.PercentageCoverage > 0 &&<br/>
+     m.PercentageCoverage < 100<br/>
+<br/>
+  orderby m.NbLinesOfCodeNotCovered ascending,<br/>
+          m.NbLinesOfCode descending<br/>
+select new { m, m.PercentageCoverage, m.NbLinesOfCode, <br/>
+             m.NbLinesOfCodeCovered, m.NbLinesOfCodeNotCovered, <br/>
+             m.ILCyclomaticComplexity, m.ILNestingDepth, m.NbVariables }  <br/>]]></description>
   </rule>
   <rule>
     <key>MethodChangedPoorlyCovered</key>
@@ -1138,7 +2118,16 @@ from m in Application.Methods where
            m.NbLinesOfCodeNotCovered ,
            m.PercentageCoverage
 ]]></code>
-    <description><![CDATA[Method changed poorly covered]]></description>
+    <description><![CDATA[<br/>
+from m in Application.Methods where <br/>
+  m.PercentageCoverage < 30 && <br/>
+  m.CodeWasChanged() <br/>
+  orderby m.NbLinesOfCode descending, <br/>
+           m.NbLinesOfCodeNotCovered ,<br/>
+           m.PercentageCoverage<br/>
+select new { m, m.PercentageCoverage, m.NbLinesOfCode, <br/>
+             m.NbLinesOfCodeNotCovered }  <br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>MethodAddedPoorlyCovered</key>
@@ -1155,7 +2144,17 @@ from m in Application.Methods where
            m.NbLinesOfCodeNotCovered ,
            m.PercentageCoverage
 ]]></code>
-    <description><![CDATA[Method added poorly covered]]></description>
+    <description><![CDATA[<br/>
+from m in Application.Methods where<br/>
+  m.NbLinesOfCode > 0 &&<br/>
+  m.PercentageCoverage < 30 && <br/>
+  m.WasAdded() <br/>
+  orderby m.NbLinesOfCode descending, <br/>
+           m.NbLinesOfCodeNotCovered ,<br/>
+           m.PercentageCoverage<br/>
+select new { m, m.PercentageCoverage, m.NbLinesOfCode, <br/>
+             m.NbLinesOfCodeNotCovered } <br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>TypesToCovered</key>
@@ -1173,7 +2172,24 @@ from t in Application.Types where
            t.NbLinesOfCodeNotCovered ,
            t.PercentageCoverage
 ]]></code>
-    <description><![CDATA[Types 95% to 99% covered]]></description>
+    <description><![CDATA[<br/>
+from t in Application.Types where <br/>
+  t.PercentageCoverage >= 95 && <br/>
+  t.PercentageCoverage <= 99 &&<br/>
+ !t.IsGeneratedByCompiler<br/>
+<br/>
+  let methodsCulprit = t.Methods.Where(m => m.PercentageCoverage < 100)<br/>
+<br/>
+  orderby t.NbLinesOfCode descending , <br/>
+           t.NbLinesOfCodeNotCovered ,<br/>
+           t.PercentageCoverage<br/>
+select new { t, t.PercentageCoverage, t.NbLinesOfCode, <br/>
+             t.NbLinesOfCodeNotCovered, methodsCulprit } <br/>
+<br/>
+// Having types 100% covered by tests is a good idea because <br/>
+// the small portion of code hard to cover, is also the <br/>
+// portion of code that is the most likely to contain bugs.<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>TypesTaggedWithFullcoveredattributeShouldBeCovered</key>
@@ -1192,7 +2208,31 @@ let notFullCoveredMethods = t.Methods.Where(
                                     !m.HasAttribute("NDepend.Attributes.UncoverableByTestAttribute".AllowNoMatch()))
 orderby t.NbLinesOfCodeNotCovered descending
 ]]></code>
-    <description><![CDATA[Types tagged with FullCoveredAttribute should be 100% covered]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 <br/>
+from t in Application.Types where<br/>
+  t.HasAttribute ("NDepend.Attributes.FullCoveredAttribute".AllowNoMatch()) &&<br/>
+  t.PercentageCoverage < 100<br/>
+<br/>
+let notFullCoveredMethods = t.Methods.Where(<br/>
+                               m =>  m.NbLinesOfCode> 0 && <br/>
+                                     m.PercentageCoverage < 100 &&<br/>
+                                    !m.HasAttribute("NDepend.Attributes.UncoverableByTestAttribute".AllowNoMatch()))<br/>
+<br/>
+orderby t.NbLinesOfCodeNotCovered descending <br/>
+<br/>
+select new { t, t.PercentageCoverage, t.NbLinesOfCodeNotCovered, notFullCoveredMethods,<br/>
+                t.NbLinesOfCode, t.NbLinesOfCodeCovered }<br/>
+<br/>
+// By using a FullCoveredAttribute, you can signify to developers<br/>
+// that a class is, and must remain in the future, 100% covered by tests.<br/>
+// If you don't want to link NDepend.API.dll, <br/>
+// you can use your own attribute and adapt this rule.<br/>
+<br/>
+// Having types 100% covered by tests is a good idea because <br/>
+// the small portion of code hard to cover, is also the <br/>
+// portion of code that is the most likely to contain bugs.<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>TypesCoveredShouldBeTaggedWithFullcoveredattribute</key>
@@ -1206,7 +2246,21 @@ warnif count > 0 from t in JustMyCode.Types where
   t.PercentageCoverage == 100 &&
  !t.IsGeneratedByCompiler
 ]]></code>
-    <description><![CDATA[Types 100% covered should be tagged with FullCoveredAttribute]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in JustMyCode.Types where<br/>
+ !t.HasAttribute ("NDepend.Attributes.FullCoveredAttribute".AllowNoMatch()) &&<br/>
+  t.PercentageCoverage == 100 &&<br/>
+ !t.IsGeneratedByCompiler<br/>
+select new { t, t.NbLinesOfCode }<br/>
+<br/>
+// By using a FullCoveredAttribute, you can signify to developers<br/>
+// that a class is, and must remain in the future, 100% covered by tests.<br/>
+// If you don't want to link NDepend.API.dll, you can use your own attribute and adapt this rule.<br/>
+<br/>
+// Having types 100% covered by tests is a good idea because <br/>
+// the small portion of code hard to cover, is also the <br/>
+// portion of code that is the most likely to contain bugs.<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>TypesNotCoveredAtAll</key>
@@ -1219,7 +2273,12 @@ from t in Application.Types where
   t.PercentageCoverage == 0
   orderby t.NbLinesOfCode descending
 ]]></code>
-    <description><![CDATA[Types not covered at all]]></description>
+    <description><![CDATA[<br/>
+from t in Application.Types where <br/>
+  t.PercentageCoverage == 0<br/>
+  orderby t.NbLinesOfCode descending<br/>
+select new { t, t.NbLinesOfCode } <br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsDirectlyCalledByTestMethods</key>
@@ -1243,7 +2302,33 @@ from m in Application.Methods.UsedByAny(testMethods)
 // --- Uncomment this line if your test methods are in dedicated test assemblies ---
 //where !testAssemblies.Contains(m.ParentAssembly)
 ]]></code>
-    <description><![CDATA[Methods directly called by test Methods]]></description>
+    <description><![CDATA[<br/>
+<br/>
+// Lists all methods directly called by tests methods.<br/>
+// Overrides of virtual and absract methods, called through polymorphism, are not listed.<br/>
+// Methods solely invoked through a delegate are not listed.<br/>
+// Methods solely invoked through reflection are not listed.<br/>
+<br/>
+// We advise to not include test assemblies in code analyzed by NDepend.<br/>
+// But if you wish the current query to run properly, <br/>
+// you'll need to consider test assemblies in your list of application assemblies analyzed by NDepend..<br/>
+<br/>
+let testAttr = ThirdParty.Types.WithNameIn("TestAttribute", "TestCaseAttribute")<br/>
+let testMethods = Methods.TaggedWithAnyAttributes(testAttr).ToHashSet()<br/>
+<br/>
+// --- Uncomment this line if your test methods are in dedicated test assemblies ---<br/>
+//let testAssemblies = testMethods.ParentAssemblies().ToHashSet()<br/>
+<br/>
+from m in Application.Methods.UsedByAny(testMethods)<br/>
+<br/>
+// --- Uncomment this line if your test methods are in dedicated test assemblies ---<br/>
+//where !testAssemblies.Contains(m.ParentAssembly)<br/>
+<br/>
+select new { m , <br/>
+             calledByTests = m.MethodsCallingMe.Intersect(testMethods ),<br/>
+             // --- Uncomment this line if your project import some coverage data ---<br/>
+             // m.PercentageCoverage <br/>
+}<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsDirectlyAndIndirectlyCalledByTestMethods</key>
@@ -1270,7 +2355,39 @@ orderby pair.Value ascending
 // --- Uncomment this line if your test methods are in dedicated test assemblies ---
 //&& !testAssemblies.Contains(pair.CodeElement.ParentAssembly)
 ]]></code>
-    <description><![CDATA[Methods directly and indirectly called by test Methods]]></description>
+    <description><![CDATA[<br/>
+<br/>
+// Lists all methods called directly or indirectly by tests methods.<br/>
+// Overrides of virtual and absract methods, called through polymorphism, are not listed.<br/>
+// Methods solely invoked through a delegate are not listed.<br/>
+// Methods solely invoked through reflection are not listed.<br/>
+<br/>
+// We advise to not include test assemblies in code analyzed by NDepend.<br/>
+// But if you wish the current query to run properly, <br/>
+// you'll need to consider test assemblies in your list of application assemblies analyzed by NDepend.<br/>
+<br/>
+let testAttr = from t in ThirdParty.Types.WithNameIn("TestAttribute", "TestCaseAttribute") select t<br/>
+let testMethods = Methods.TaggedWithAnyAttributes(testAttr)<br/>
+<br/>
+// --- Uncomment this line if your test methods are in dedicated test assemblies ---<br/>
+// let testAssemblies = testMethods.ParentAssemblies().ToHashSet()<br/>
+<br/>
+let depthOfCalledByTest = Application.Methods.DepthOfIsUsedByAny(testMethods)<br/>
+from pair in depthOfCalledByTest<br/>
+where pair.Value > 0 <br/>
+orderby pair.Value ascending<br/>
+// --- Uncomment this line if your test methods are in dedicated test assemblies ---<br/>
+//&& !testAssemblies.Contains(pair.CodeElement.ParentAssembly)<br/>
+<br/>
+select new { <br/>
+  method = pair.CodeElement, <br/>
+  // (depthOfCalledByTests == 1) means that the method is directly called by tests<br/>
+  // (depthOfCalledByTests == 2) means that the method is directly called by a method directly called by tests<br/>
+  // ...<br/>
+  depthOfCalledByTests = pair.Value,<br/>
+  // --- Uncomment this line if your project import some coverage data ---<br/>
+  // m.PercentageCoverage<br/>
+}<br/>]]></description>
   </rule>
   <rule>
     <key>PotentiallyDeadTypes</key>
@@ -1303,7 +2420,37 @@ types => from t in codeBase.Application.Types.UsedByAny(types).Except(types)
          select t)
 from t in deadTypesMetric.DefinitionDomain
 ]]></code>
-    <description><![CDATA[Potentially dead Types]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0<br/>
+// Filter procedure for types that should'nt be considered as dead<br/>
+let canTypeBeConsideredAsDeadProc = new Func<IType, bool>(<br/>
+   t => !t.IsPublic && //   Public types might be used by client applications of your assemblies.<br/>
+         t.Name != "Program" && <br/>
+        !t.IsGeneratedByCompiler &&<br/>
+<br/>
+         // If you don't want to link NDepend.API.dll, you can use your own IsNotDeadCodeAttribute and adapt this rule.<br/>
+        !t.HasAttribute("NDepend.Attributes.IsNotDeadCodeAttribute".AllowNoMatch()) &&<br/>
+<br/>
+        // Exclude static types that define only const fields<br/>
+        // because they cannot be seen as used in IL code.<br/>
+        !(t.IsStatic && t.NbMethods == 0 && !t.Fields.Where(f => !f.IsLiteral).Any()))<br/>
+<br/>
+<br/>
+// Select types unused<br/>
+let typesUnused = <br/>
+   from t in JustMyCode.Types where<br/>
+   t.NbTypesUsingMe == 0 && canTypeBeConsideredAsDeadProc(t)<br/>
+   select t<br/>
+<br/>
+// Dead types = types used only by unused types (recursive)<br/>
+let deadTypesMetric = typesUnused.FillIterative(<br/>
+types => from t in codeBase.Application.Types.UsedByAny(types).Except(types)<br/>
+         where canTypeBeConsideredAsDeadProc(t) &&<br/>
+               t.TypesUsingMe.Intersect(types).Count() == t.NbTypesUsingMe<br/>
+         select t)<br/>
+<br/>
+from t in deadTypesMetric.DefinitionDomain<br/>
+select new { t, t.TypesUsingMe, depth = deadTypesMetric[t] }<br/>]]></description>
   </rule>
   <rule>
     <key>PotentiallyDeadMethods</key>
@@ -1351,7 +2498,51 @@ let deadMethodsMetric = methodsUnused.FillIterative(
               select m)
 from m in JustMyCode.Methods.Intersect(deadMethodsMetric.DefinitionDomain)
 ]]></code>
-    <description><![CDATA[Potentially dead Methods]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0<br/>
+// Filter procedure for methods that should'nt be considered as dead<br/>
+let canMethodBeConsideredAsDeadProc = new Func<IMethod, bool>(<br/>
+    m => !m.IsPubliclyVisible &&       // Public methods might be used by client applications of your assemblies.<br/>
+         !m.IsEntryPoint &&            // Main() method is not used by-design.<br/>
+         !m.IsExplicitInterfaceImpl && // The IL code never explicitely calls explicit interface methods implementation.<br/>
+         !m.IsClassConstructor &&      // The IL code never explicitely calls class constructors.<br/>
+         !m.IsFinalizer &&             // The IL code never explicitely calls finalizers.<br/>
+         !m.IsVirtual &&               // Only check for non virtual method that are not seen as used in IL.<br/>
+         !(m.IsConstructor &&          // Don't take account of protected ctor that might be call by a derived ctors.<br/>
+           m.IsProtected) &&<br/>
+         !m.IsEventAdder &&            // The IL code never explicitely calls events adder/remover.<br/>
+         !m.IsEventRemover &&<br/>
+         !m.IsGeneratedByCompiler &&<br/>
+         !m.ParentType.IsDelegate &&<br/>
+<br/>
+         // Methods tagged with these two attributes are called by the serialization infrastructure.<br/>
+         !m.HasAttribute("System.Runtime.Serialization.OnSerializingAttribute".AllowNoMatch()) &&<br/>
+         !m.HasAttribute("System.Runtime.Serialization.OnDeserializedAttribute".AllowNoMatch()) &&<br/>
+<br/>
+         // If you don't want to link NDepend.API.dll, you can use your own IsNotDeadCodeAttribute and adapt this rule.<br/>
+         !m.HasAttribute("NDepend.Attributes.IsNotDeadCodeAttribute".AllowNoMatch()))<br/>
+<br/>
+// Get methods unused<br/>
+let methodsUnused = <br/>
+   from m in JustMyCode.Methods where <br/>
+   m.NbMethodsCallingMe == 0 && <br/>
+   canMethodBeConsideredAsDeadProc(m)<br/>
+   select m<br/>
+<br/>
+// Dead methods = methods used only by unused methods (recursive)<br/>
+let deadMethodsMetric = methodsUnused.FillIterative(<br/>
+   methods => // Unique loop, just to let a chance to build the hashset.<br/>
+              from o in (new object()).ToEnumerable()<br/>
+              // Use a hashet to make Intersect calls much faster!<br/>
+              let hashset = methods.ToHashSet()<br/>
+              from m in codeBase.Application.Methods.UsedByAny(methods).Except(methods)<br/>
+              where canMethodBeConsideredAsDeadProc(m) &&<br/>
+                    // Select methods called only by methods already considered as dead<br/>
+                    hashset.Intersect(m.MethodsCallingMe).Count() == m.NbMethodsCallingMe<br/>
+              select m)<br/>
+<br/>
+from m in JustMyCode.Methods.Intersect(deadMethodsMetric.DefinitionDomain)<br/>
+select new { m, m.MethodsCallingMe, depth = deadMethodsMetric[m] }<br/>]]></description>
   </rule>
   <rule>
     <key>WrongUsageOfIsnotdeadcodeattribute</key>
@@ -1392,7 +2583,47 @@ let fields = from f in Application.Fields where
    select f
 where types.Count() > 0 || methods.Count() > 0 || fields.Count() > 0
 ]]></code>
-    <description><![CDATA[Wrong usage of IsNotDeadCodeAttribute]]></description>
+    <description><![CDATA[<br/>
+<br/>
+// This IsNotDeadCodeAttribute can be used to signify that <br/>
+// despite a member could be removed without provoking any syntax error <br/>
+// (we also say it is dead code), your intention is to not remove this member.<br/>
+// Default 'Dead Code' code rules take account of this attribute.<br/>
+// IsNotDeadCodeAttribute is defined in NDepend.API.dll<br/>
+// If you don't want to link NDepend.API.dll, you can use <br/>
+// your own IsNotDeadCodeAttribute and adapt this rule.<br/>
+warnif count == 1<br/>
+<br/>
+let tAttr = Types.WithFullName("NDepend.Attributes.IsNotDeadCodeAttribute").FirstOrDefault()<br/>
+where tAttr != null<br/>
+<br/>
+// Get types that do a wrong usage of IsNotDeadCodeAttribute<br/>
+let types = from t in Application.Types where <br/>
+   t.HasAttribute("NDepend.Attributes.IsNotDeadCodeAttribute".AllowNoMatch()) &&<br/>
+<br/>
+   ( // types used don't need to be tagged with IsNotDeadCodeAttribute!<br/>
+     t.NbTypesUsingMe > 0  ||<br/>
+   <br/>
+     // Static types that define only const fields cannot be seen as used in IL code.<br/>
+     // They don't need to be tagged with IsNotDeadCodeAttribute.<br/>
+     (t.IsStatic && t.NbMethods == 0 && !t.Fields.Where(f => !f.IsLiteral).Any())<br/>
+   )<br/>
+   select t<br/>
+<br/>
+// Get methods that do a wrong usage of IsNotDeadCodeAttribute<br/>
+let methods = from m in Application.Methods where <br/>
+   m.HasAttribute("NDepend.Attributes.IsNotDeadCodeAttribute".AllowNoMatch()) &&<br/>
+   m.NbMethodsCallingMe > 0<br/>
+   select m<br/>
+<br/>
+// Get fields that do a wrong usage of IsNotDeadCodeAttribute<br/>
+let fields = from f in Application.Fields where <br/>
+   f.HasAttribute("NDepend.Attributes.IsNotDeadCodeAttribute".AllowNoMatch()) &&<br/>
+   f.NbMethodsUsingMe > 0<br/>
+   select f<br/>
+<br/>
+where types.Count() > 0 || methods.Count() > 0 || fields.Count() > 0<br/>
+select new { tAttr, types , methods, fields }<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsThatCouldHaveALowerVisibility</key>
@@ -1418,7 +2649,31 @@ warnif count > 0 from m in JustMyCode.Methods where
   // Don't decrease the visibility of Main() methods.
   !m.IsEntryPoint
 ]]></code>
-    <description><![CDATA[Methods that could have a lower visibility]]></description>
+    <description><![CDATA[<br/>
+// This rule tells which methods can be declared with a lower visibility.<br/>
+// (like 'private' is a visibility lower than 'internal' which is lower than 'public').<br/>
+// Reducing visibility is a good practice because this fosters encapsulation<br/>
+// and with it maintainability and extensibility.<br/>
+        <br/>
+warnif count > 0 from m in JustMyCode.Methods where <br/>
+  m.Visibility != m.OptimalVisibility &&<br/>
+  !m.HasAttribute("NDepend.Attributes.CannotDecreaseVisibilityAttribute".AllowNoMatch()) &&<br/>
+  !m.HasAttribute("NDepend.Attributes.IsNotDeadCodeAttribute".AllowNoMatch()) &&<br/>
+  // If you don't want to link NDepend.API.dll, you can use your own attributes and adapt this rule.<br/>
+  <br/>
+  // Eliminate default constructor from the result.<br/>
+  // Whatever the visibility of the declaring class,<br/>
+  // default constructors are public and introduce noise<br/>
+  // in the current rule.<br/>
+  !( m.IsConstructor && m.IsPublic && m.NbParameters == 0) &&<br/>
+<br/>
+  // Don't decrease the visibility of Main() methods.<br/>
+  !m.IsEntryPoint<br/>
+<br/>
+select new { m, <br/>
+             m.Visibility , <br/>
+             CouldBeDeclared = m.OptimalVisibility,<br/>
+             m.MethodsCallingMe }<br/>]]></description>
   </rule>
   <rule>
     <key>TypesThatCouldHaveALowerVisibility</key>
@@ -1447,7 +2702,36 @@ warnif count > 0 from t in JustMyCode.Types where
         tUser.IsInterface &&
         tUser.Visibility == t.Visibility)
 ]]></code>
-    <description><![CDATA[Types that could have a lower visibility]]></description>
+    <description><![CDATA[<br/>
+// This rule tells which types can be declared with a lower visibility.<br/>
+// (like 'private' is a visibility lower than 'internal' which is lower than 'public').<br/>
+// Reducing visibility is a good practice because this fosters encapsulation<br/>
+// and with it maintainability and extensibility.<br/>
+        <br/>
+warnif count > 0 from t in JustMyCode.Types where <br/>
+<br/>
+  t.Visibility != t.OptimalVisibility &&<br/>
+<br/>
+  // If you don't want to link NDepend.API.dll, you can use your own attributes and adapt this rule.<br/>
+ !t.HasAttribute("NDepend.Attributes.CannotDecreaseVisibilityAttribute".AllowNoMatch()) &&<br/>
+ !t.HasAttribute("NDepend.Attributes.IsNotDeadCodeAttribute".AllowNoMatch()) &&<br/>
+<br/>
+  // Static types that define only const fields cannot be seen as used in IL code.<br/>
+  // They don't have to be tagged with CannotDecreaseVisibilityAttribute.<br/>
+  !( t.IsStatic && <br/>
+    !t.Methods.Any(m => !m.IsClassConstructor) && <br/>
+    !t.Fields.Any(f => !f.IsLiteral && !(f.IsStatic && f.IsInitOnly))) &&<br/>
+<br/>
+  // A type used by an interface that has the same visibility<br/>
+  // cannot have its visibility decreased, else a compilation error occurs!<br/>
+  !t.TypesUsingMe.Any(tUser => <br/>
+        tUser.IsInterface && <br/>
+        tUser.Visibility == t.Visibility)<br/>
+<br/>
+select new { t, t.Visibility , <br/>
+                CouldBeDeclared = t.OptimalVisibility, <br/>
+                t.TypesUsingMe }<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>TypesThatCouldBeDeclaredAsPrivateNestedInAParentType</key>
@@ -1475,7 +2759,27 @@ where !couldBeNestedIn.IsGeneratedByCompiler &&
        // ...declared in the same namespace
        couldBeNestedIn.ParentNamespace == t.ParentNamespace
 ]]></code>
-    <description><![CDATA[Types that could be declared as private, nested in a parent type]]></description>
+    <description><![CDATA[<br/>
+// The conditions for a type to be nested into a parent type<br/>
+// is that the parent type is the only type using it,<br/>
+// and that the parent type is declared in the same namespace.<br/>
+//<br/>
+// Declaring a type as private into a parent type helps enforcing encapsulation.<br/>
+// But since nested private types are hardly testable, this rule might <br/>
+// not be applied for types used directly by tests.<br/>
+<br/>
+warnif count > 0 <br/>
+from t in Application.Types<br/>
+where !t.IsGeneratedByCompiler &&<br/>
+      !t.IsNested &&<br/>
+      !t.IsPubliclyVisible &&<br/>
+       // Only one type user...<br/>
+       t.TypesUsingMe.Count() == 1 <br/>
+let couldBeNestedIn = t.TypesUsingMe.Single()<br/>
+where !couldBeNestedIn.IsGeneratedByCompiler &&<br/>
+       // ...declared in the same namespace<br/>
+       couldBeNestedIn.ParentNamespace == t.ParentNamespace<br/>
+select new { t, couldBeNestedIn }<br/>]]></description>
   </rule>
   <rule>
     <key>ConstructorsOfAbstractClassesShouldBeDeclaredAsProtectedOrPrivate</key>
@@ -1495,7 +2799,21 @@ from t in Application.Types where
 let ctors = t.Constructors.Where(c => !c.IsProtected && !c.IsPrivate)
 where ctors.Count() > 0
 ]]></code>
-    <description><![CDATA[Constructors of abstract classes should be declared as protected or private]]></description>
+    <description><![CDATA[<br/>
+// Constructors of an abstract class can be accessed only from its class and derived class.<br/>
+// Declaring such a constructor with another visibility level is useless and potentially misleading.<br/>
+<br/>
+// Notice that if a constructor of an abstract class is declared as private,<br/>
+// it can only be accessed from derived classes nested in the abstract class.<br/>
+<br/>
+warnif count > 0<br/>
+from t in Application.Types where <br/>
+  t.IsClass && <br/>
+  t.IsAbstract<br/>
+let ctors = t.Constructors.Where(c => !c.IsProtected && !c.IsPrivate)<br/>
+where ctors.Count() > 0<br/>
+select new { t, ctors }<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidPublicMethodsNotPubliclyVisible</key>
@@ -1521,7 +2839,26 @@ from m in JustMyCode.Methods where
    // Eliminate methods generated by compiler
    !m.IsGeneratedByCompiler
 ]]></code>
-    <description><![CDATA[Avoid public methods not publicly visible]]></description>
+    <description><![CDATA[<br/>
+// Matched methods are declared public but are not publicly visible by assemblies consumers.<br/>
+// Their visibility level must be decreased.<br/>
+<br/>
+warnif count > 0<br/>
+from m in JustMyCode.Methods where <br/>
+   !m.IsPubliclyVisible && m.IsPublic &&<br/>
+<br/>
+   // Eliminate virtual methods<br/>
+   !m.IsVirtual &&<br/>
+   // Eliminate interface and delegate types<br/>
+   !m.ParentType.IsInterface &&<br/>
+   !m.ParentType.IsDelegate &&<br/>
+   // Eliminate default constructors<br/>
+   !(m.IsConstructor && m.NbParameters == 0) &&<br/>
+   // Eliminate operators that must be declared public<br/>
+   !m.IsOperator &&<br/>
+   // Eliminate methods generated by compiler<br/>
+   !m.IsGeneratedByCompiler <br/>
+select m<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsThatShouldBeDeclaredAspublicInCpublicInVbnet</key>
@@ -1538,7 +2875,17 @@ from m in Application.Methods where
   m.ShouldBePublic
 let usedInAssemblies = m.MethodsCallingMe.ParentAssemblies().Except(m.ParentAssembly)
 ]]></code>
-    <description><![CDATA[Methods that should be declared as 'public' in C#, 'Public' in VB.NET]]></description>
+    <description><![CDATA[<br/>
+// The condition 'ShouldBePublic' shows code elements <br/>
+// declared as 'internal\Friend' that are used outside <br/>
+// of their assembly thanks to the Attribute <br/>
+// System.Runtime.CompilerServices.InternalsVisibleToAttribute<br/>
+<br/>
+from m in Application.Methods where <br/>
+  m.ShouldBePublic<br/>
+let usedInAssemblies = m.MethodsCallingMe.ParentAssemblies().Except(m.ParentAssembly)<br/>
+select new { m, m.ParentAssembly,  usedInAssemblies, m.MethodsCallingMe }<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>WrongUsageOfCannotdecreasevisibilityattribute</key>
@@ -1578,7 +2925,46 @@ let fields = from f in Application.Fields where
    select f
 where types.Count() > 0 || methods.Count() > 0 || fields.Count() > 0
 ]]></code>
-    <description><![CDATA[Wrong usage of CannotDecreaseVisibilityAttribute]]></description>
+    <description><![CDATA[<br/>
+<br/>
+// The CannotDecreaseVisibilityAttribute can be used to signify that despite <br/>
+// a member could have a lower visibility without provoking any syntax error,<br/>
+// your intention is to not change this member visibility.<br/>
+// Default Visibility code rules take account of this attribute.<br/>
+// CannotDecreaseVisibilityAttribute is defined in NDepend.API.dll<br/>
+// If you don't want to link NDepend.API.dll, you can use <br/>
+// your own CannotDecreaseVisibilityAttribute and adapt this rule.<br/>
+<br/>
+warnif count == 1<br/>
+<br/>
+let tAttr = Types.WithFullName("NDepend.Attributes.CannotDecreaseVisibilityAttribute").FirstOrDefault()<br/>
+where tAttr != null<br/>
+<br/>
+// Get types that do a wrong usage of CannotDecreaseVisibilityAttribute<br/>
+let types = from t in Application.Types where <br/>
+   t.HasAttribute("NDepend.Attributes.CannotDecreaseVisibilityAttribute".AllowNoMatch()) &&<br/>
+   ( t.Visibility == t.OptimalVisibility ||<br/>
+<br/>
+     // Static types that define only const fields cannot be seen as used in IL code.<br/>
+     // They don't need to be tagged with CannotDecreaseVisibilityAttribute.<br/>
+     (t.IsStatic && t.NbMethods == 0 && !t.Fields.Where(f => !f.IsLiteral).Any())<br/>
+   )<br/>
+   select t<br/>
+<br/>
+// Get methods that do a wrong usage of CannotDecreaseVisibilityAttribute<br/>
+let methods = from m in Application.Methods where <br/>
+   m.HasAttribute("NDepend.Attributes.CannotDecreaseVisibilityAttribute".AllowNoMatch()) &&<br/>
+   m.Visibility == m.OptimalVisibility<br/>
+   select m<br/>
+<br/>
+// Get fields that do a wrong usage of CannotDecreaseVisibilityAttribute<br/>
+let fields = from f in Application.Fields where <br/>
+   f.HasAttribute("NDepend.Attributes.CannotDecreaseVisibilityAttribute".AllowNoMatch()) &&<br/>
+   f.Visibility == f.OptimalVisibility<br/>
+   select f<br/>
+<br/>
+where types.Count() > 0 || methods.Count() > 0 || fields.Count() > 0<br/>
+select new { tAttr, types , methods, fields }<br/>]]></description>
   </rule>
   <rule>
     <key>EventHandlerMethodsShouldBeDeclaredPrivate</key>
@@ -1598,7 +2984,24 @@ from m in Application.Methods where
   !m.ParentType.IsDelegate &&
   !m.IsGeneratedByCompiler
 ]]></code>
-    <description><![CDATA[Event handler methods should be declared private]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0<br/>
+from m in Application.Methods where <br/>
+  !m.IsPrivate &&<br/>
+<br/>
+   // A method is considered as event handler if...<br/>
+   m.NbParameters==2 &&            // ...it has two parameters..<br/>
+   m.Name.Contains("Object") &&    // ...of types Object...<br/>
+   m.Name.Contains("EventArgs") && // ...and EventArgs<br/>
+   <br/>
+   // Discard special cases<br/>
+  !m.ParentType.IsDelegate &&<br/>
+  !m.IsGeneratedByCompiler<br/>
+<br/>
+select new { m,m.Visibility }<br/>
+// This rule implementation relies on the facts that:<br/>
+// -> A method name contains the type of its parameters.<br/>
+// -> All EventArgs derived types have the suffix "EventArgs".<br/>]]></description>
   </rule>
   <rule>
     <key>StructuresShouldBeImmutable</key>
@@ -1612,7 +3015,27 @@ warnif count > 0 from t in Application.Types where
   !t.IsImmutable
 let mutableFields = t.Fields.Where(f => !f.IsImmutable)
 ]]></code>
-    <description><![CDATA[Structures should be immutable]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in Application.Types where <br/>
+   t.IsStructure && <br/>
+  !t.IsImmutable<br/>
+<br/>
+let mutableFields = t.Fields.Where(f => !f.IsImmutable)<br/>
+<br/>
+select new { t, t.NbLinesOfCode, mutableFields }<br/>
+<br/>
+// It is deemed as a good practice to make <br/>
+// your structure immutable.<br/>
+// An object is immutable if its state doesn’t <br/>
+// change once the object has been created. <br/>
+// Consequently, a structure is immutable if <br/>
+// its instances are immutable.<br/>
+// Immutable types naturally simplify code by <br/>
+// limiting side-effects.<br/>
+// See some explanations on immutability and <br/>
+// how NDepend supports it here:<br/>
+// http://codebetter.com/blogs/patricksmacchia/archive/2008/01/13/immutable-types-understand-them-and-use-them.aspx<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>PropertyGettersShouldBeImmutable</key>
@@ -1627,7 +3050,21 @@ warnif count > 0 from m in Application.Methods where
     (  m.IsStatic && m.ChangesTypeState) )
 let fieldsAssigned = m.FieldsAssigned
 ]]></code>
-    <description><![CDATA[Property Getters should be immutable]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in Application.Methods where<br/>
+  m.IsPropertyGetter &&<br/>
+  ( ( !m.IsStatic && m.ChangesObjectState) ||<br/>
+    (  m.IsStatic && m.ChangesTypeState) )<br/>
+<br/>
+let fieldsAssigned = m.FieldsAssigned<br/>
+<br/>
+select new { m, m.NbLinesOfCode, fieldsAssigned  }<br/>
+<br/>
+// This rule might be violated in the case of object lazy initialized<br/>
+// when the property getter is accessed the first time.<br/>
+// But in general, the callers of a property <br/>
+// doesn't expect to change any state through the call.<br/>
+    <br/>]]></description>
   </rule>
   <rule>
     <key>TypesImmutableShouldBeTaggedWithImmutableattribute</key>
@@ -1640,7 +3077,22 @@ from t in Application.Types where
   !t.HasAttribute ("NDepend.Attributes.ImmutableAttribute".AllowNoMatch()) &&
   t.IsImmutable
 ]]></code>
-    <description><![CDATA[Types immutable should be tagged with ImmutableAttribute]]></description>
+    <description><![CDATA[<br/>
+from t in Application.Types where <br/>
+  !t.HasAttribute ("NDepend.Attributes.ImmutableAttribute".AllowNoMatch()) && <br/>
+  t.IsImmutable<br/>
+select new { t, t.NbLinesOfCode }<br/>
+<br/>
+// Types matched by this query are immutable but <br/>
+// are not tagged with the ImmutableAttribute.<br/>
+// The benefit of tagging them with the ImmutableAttribute <br/>
+// is that the rule 'Regression on immutable types' <br/>
+// will warn when the immutability of a type gets broken.<br/>
+<br/>
+// NDepend.Attributes.ImmutableAttribute is defined in the <br/>
+// redistributable assembly $NDependInstallDir$\Lib\NDepend.API.dll<br/>
+// You can define your own attribute to tag 'immutable' types.<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsTaggedWithPureattributeMustBePure</key>
@@ -1656,7 +3108,32 @@ warnif count > 0 from m in Application.Methods where
     m.NbLinesOfCode > 0
 let fieldsAssigned = m.FieldsAssigned
 ]]></code>
-    <description><![CDATA[Methods tagged with PureAttribute must be pure]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in Application.Methods where <br/>
+  ( m.HasAttribute ("NDepend.Attributes.PureAttribute".AllowNoMatch()) || <br/>
+    m.HasAttribute ("System.Diagnostics.Contract.PureAttribute".AllowNoMatch()) ) &&<br/>
+  ( m.ChangesObjectState || m.ChangesTypeState ) &&<br/>
+    m.NbLinesOfCode > 0<br/>
+<br/>
+let fieldsAssigned = m.FieldsAssigned<br/>
+<br/>
+select new { m, m.NbLinesOfCode, fieldsAssigned }<br/>
+<br/>
+// A method is pure if its execution doesn’t change <br/>
+// the value of any instance or static field. <br/>
+// Pure methods naturally simplify code by limiting <br/>
+// side-effects.<br/>
+// See some explanations on immutability - purity and <br/>
+// how NDepend supports it here:<br/>
+// http://codebetter.com/blogs/patricksmacchia/archive/2008/01/13/immutable-types-understand-them-and-use-them.aspx<br/>
+<br/>
+// NDepend.Attributes.PureAttribute is defined in the <br/>
+// redistributable assembly $NDependInstallDir$\Lib\NDepend.API.dll<br/>
+// You can define your own attribute to tag 'pure' methods<br/>
+// or you can use as well System.Diagnostics.Contract.PureAttribute<br/>
+// introduced with .NET v4.0.<br/>
+<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>PureMethodsShouldBeTaggedWithPureattribute</key>
@@ -1671,7 +3148,25 @@ from m in Application.Methods where
   !m.ChangesObjectState && !m.ChangesTypeState &&
    m.NbLinesOfCode > 0
 ]]></code>
-    <description><![CDATA[Pure methods should be tagged with PureAttribute]]></description>
+    <description><![CDATA[<br/>
+from m in Application.Methods where <br/>
+  !m.HasAttribute ("NDepend.Attributes.PureAttribute".AllowNoMatch()) && <br/>
+  !m.HasAttribute ("System.Diagnostics.Contract.PureAttribute".AllowNoMatch()) &&<br/>
+  !m.ChangesObjectState && !m.ChangesTypeState &&<br/>
+   m.NbLinesOfCode > 0<br/>
+select new { m, m.NbLinesOfCode }<br/>
+<br/>
+// Methods matched by this query are pure but <br/>
+// are not tagged with the PureAttribute.<br/>
+// The benefit of tagging them with the PureAttribute <br/>
+// is that the rule 'Regression on pure methods'<br/>
+// will warn when the purity of a method gets broken.<br/>
+<br/>
+// NDepend.Attributes.PureAttribute is defined in the <br/>
+// redistributable assembly $NDependInstallDir$\Lib\NDepend.API.dll<br/>
+// You can define your own attribute to tag 'pure' methods<br/>
+// or you can use as well System.Diagnostics.Contract.PureAttribute<br/>
+// introduced with .NET v4.0.<br/>]]></description>
   </rule>
   <rule>
     <key>InterfaceNameShouldBeginWithAi</key>
@@ -1686,7 +3181,16 @@ t.IsInterface
 let name = !t.IsNested  ? t.Name : t.Name.Substring(t.Name.LastIndexOf('+') + 1, t.Name.Length - t.Name.LastIndexOf('+') - 1)
 where name[0] != 'I'
 ]]></code>
-    <description><![CDATA[Interface name should begin with a 'I']]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in Application.Types where <br/>
+t.IsInterface  <br/>
+<br/>
+// Discard outter type(s) name prefix for nested types<br/>
+let name = !t.IsNested  ? t.Name : t.Name.Substring(t.Name.LastIndexOf('+') + 1, t.Name.Length - t.Name.LastIndexOf('+') - 1) <br/>
+<br/>
+where name[0] != 'I'<br/>
+select t<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>AbstractBaseClassShouldBeSuffixedWithbase</key>
@@ -1703,7 +3207,17 @@ warnif count > 0 from t in Application.Types where
   ((!t.IsGeneric && !t.NameLike (@"Base$")) ||
    ( t.IsGeneric && !t.NameLike (@"Base<")))
 ]]></code>
-    <description><![CDATA[Abstract base class should be suffixed with 'Base']]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in Application.Types where <br/>
+  t.IsAbstract && <br/>
+  t.IsClass &&<br/>
+<br/>
+  // equivalent to:   DepthOfDeriveFrom "System.Object" == 1<br/>
+  t.DepthOfInheritance == 1 && <br/>
+<br/>
+  ((!t.IsGeneric && !t.NameLike (@"Base$")) ||<br/>
+   ( t.IsGeneric && !t.NameLike (@"Base<")))<br/>
+select new { t, t.DepthOfInheritance }<br/>]]></description>
   </rule>
   <rule>
     <key>ExceptionClassNameShouldBeSuffixedWithexception</key>
@@ -1720,7 +3234,17 @@ warnif count > 0 from t in Application.Types where
   !t.SimpleNameLike (@"ExceptionBase$") // Allow the second suffix Base
                                         // for base exception classes.
 ]]></code>
-    <description><![CDATA[Exception class name should be suffixed with 'Exception']]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in Application.Types where <br/>
+  t.IsExceptionClass && <br/>
+  // We use SimpleName, because in case of generic Exception type<br/>
+  // SimpleName suppresses the generic suffix (like <T>).<br/>
+  !t.SimpleNameLike (@"Exception$") &&<br/>
+  !t.SimpleNameLike (@"ExceptionBase$") // Allow the second suffix Base<br/>
+                                        // for base exception classes.<br/>
+select new { t, t.SimpleName }<br/>
+<br/>
+// The name of an exception class should end with 'Exception'.<br/>]]></description>
   </rule>
   <rule>
     <key>AttributeClassNameShouldBeSuffixedWithattribute</key>
@@ -1733,7 +3257,12 @@ warnif count > 0 from t in Application.Types where
    t.IsAttributeClass &&
   !t.NameLike (@"Attribute$")
 ]]></code>
-    <description><![CDATA[Attribute class name should be suffixed with 'Attribute']]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in Application.Types where <br/>
+   t.IsAttributeClass && <br/>
+  !t.NameLike (@"Attribute$") <br/>
+select new { t, t.NbLinesOfCode }<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>TypesNameShouldBeginWithAnUpperCharacter</key>
@@ -1749,7 +3278,17 @@ warnif count > 0 from t in JustMyCode.Types where
   !t.IsSpecialName &&
   !t.IsGeneratedByCompiler
 ]]></code>
-    <description><![CDATA[Types name should begin with an Upper character]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in JustMyCode.Types where <br/>
+  // The name of a type should begin with an Upper letter.<br/>
+  !t.SimpleNameLike (@"^[A-Z]") &&     <br/>
+<br/>
+  // Except if it is generated by compiler or ...<br/>
+  !t.IsSpecialName &&<br/>
+  !t.IsGeneratedByCompiler<br/>
+<br/>
+<br/>
+select new { t, t.NbLinesOfCode }<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsNameShouldBeginWithAnUpperCharacter</key>
@@ -1763,7 +3302,15 @@ warnif count > 0 from m in JustMyCode.Methods where
   !m.IsSpecialName &&
   !m.IsGeneratedByCompiler
 ]]></code>
-    <description><![CDATA[Methods name should begin with an Upper character]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in JustMyCode.Methods where <br/>
+  !m.NameLike (@"^[A-Z]") && <br/>
+  !m.IsSpecialName && <br/>
+  !m.IsGeneratedByCompiler<br/>
+select m<br/>
+<br/>
+// The name of a regular method should <br/>
+// begin with an Upper letter.<br/>]]></description>
   </rule>
   <rule>
     <key>AvoidTypesWithNameTooLong</key>
@@ -1776,7 +3323,14 @@ warnif count > 0 from t in Application.Types
 where !t.IsGeneratedByCompiler
 where t.SimpleName.Length > 35
 ]]></code>
-    <description><![CDATA[Avoid types with name too long]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in Application.Types <br/>
+where !t.IsGeneratedByCompiler<br/>
+<br/>
+where t.SimpleName.Length > 35 <br/>
+select new { t, t.SimpleName }<br/>
+<br/>
+      <br/>]]></description>
   </rule>
   <rule>
     <key>AvoidMethodsWithNameTooLong</key>
@@ -1792,7 +3346,27 @@ warnif count > 0 from m in Application.Methods where
    // Property getter/setter are prefixed with "get_" "set_" of length 4.
   ( m.IsSpecialName && m.SimpleName.Length - 4 > 35))
 ]]></code>
-    <description><![CDATA[Avoid methods with name too long]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in Application.Methods where <br/>
+ !m.IsExplicitInterfaceImpl &&<br/>
+ !m.IsGeneratedByCompiler &&<br/>
+ ((!m.IsSpecialName && m.SimpleName.Length > 35) ||<br/>
+   // Property getter/setter are prefixed with "get_" "set_" of length 4.<br/>
+  ( m.IsSpecialName && m.SimpleName.Length - 4 > 35))<br/>
+<br/>
+select new { m, m.SimpleName }<br/>
+<br/>
+// The regex matches methods with name longer <br/>
+// than 35 characters.<br/>
+// Method Name doesn't contain the type and namespace <br/>
+// prefix, FullName does.<br/>
+// The regex computes the method name length from <br/>
+// the beginning until the first open parenthesis <br/>
+// or first lower than (for generic methods).<br/>
+// Explicit Interface Implementation methods are <br/>
+// discarded because their names are prefixed <br/>
+// with the interface name.<br/>
+      <br/>]]></description>
   </rule>
   <rule>
     <key>AvoidNamingTypesAndNamespacesWithTheSameIdentifier</key>
@@ -1809,7 +3383,18 @@ let hashsetShortNames = Namespaces.Where(n => n.Name.Length > 0).Select(n => n.S
 from t in JustMyCode.Types
 where hashsetShortNames.Contains(t.Name)
 ]]></code>
-    <description><![CDATA[Avoid naming types and namespaces with the same identifier]]></description>
+    <description><![CDATA[<br/>
+<br/>
+// Not only this can provoke compiler resolution collision,<br/>
+// but also, this makes code less maintainable because<br/>
+// concepts are not concisely identified.<br/>
+<br/>
+warnif count > 0<br/>
+let hashsetShortNames = Namespaces.Where(n => n.Name.Length > 0).Select(n => n.SimpleName).ToHashSet()<br/>
+<br/>
+from t in JustMyCode.Types<br/>
+where hashsetShortNames.Contains(t.Name)<br/>
+select new { t, namespaces = Namespaces.Where(n => n.SimpleName == t.Name) }<br/>]]></description>
   </rule>
   <rule>
     <key>DontCallYourMethodDispose</key>
@@ -1823,7 +3408,12 @@ where hashsetShortNames.Contains(t.Name)
 from m in Application.Methods.WithSimpleName("Dispose")
 where !m.ParentType.Implement("System.IDisposable".AllowNoMatch())
 ]]></code>
-    <description><![CDATA[Don't call your method Dispose]]></description>
+    <description><![CDATA[<br/>
+// Methods shouldn't be called Dispose, <br/>
+// this syntax is reserved for System.IDisposable type usage.<br/>
+from m in Application.Methods.WithSimpleName("Dispose")<br/>
+where !m.ParentType.Implement("System.IDisposable".AllowNoMatch())<br/>
+select m<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsPrefixedWithtryShouldReturnABoolean</key>
@@ -1841,7 +3431,16 @@ from m in Application.Methods where
   m.ReturnType != null &&
   m.ReturnType.FullName != "System.Boolean"
 ]]></code>
-    <description><![CDATA[Methods prefixed with 'Try' should return a boolean]]></description>
+    <description><![CDATA[<br/>
+// and such TryXXX method can eventually have out parameters to return results.<br/>
+// Get inspired from the API design of:<br/>
+// System.Int32.TryParse(int,out string):bool<br/>
+warnif count > 0<br/>
+from m in Application.Methods where<br/>
+  m.SimpleNameLike("^Try") &&<br/>
+  m.ReturnType != null &&<br/>
+  m.ReturnType.FullName != "System.Boolean"<br/>
+select new { m, m.ReturnType }<br/>]]></description>
   </rule>
   <rule>
     <key>MarkIserializableTypesWithSerializableattribute</key>
@@ -1856,7 +3455,19 @@ from t in Application.Types where
   t.Implement ("System.Runtime.Serialization.ISerializable".AllowNoMatch()) &&
  !t.HasAttribute ("System.SerializableAttribute".AllowNoMatch())
 ]]></code>
-    <description><![CDATA[Mark ISerializable types with SerializableAttribute]]></description>
+    <description><![CDATA[<br/>
+from t in Application.Types where <br/>
+  t.IsPublic && <br/>
+ !t.IsDelegate &&<br/>
+  t.Implement ("System.Runtime.Serialization.ISerializable".AllowNoMatch()) && <br/>
+ !t.HasAttribute ("System.SerializableAttribute".AllowNoMatch())<br/>
+select new { t, t.NbLinesOfCode }<br/>
+<br/>
+// To be recognized by the CLR as serializable, <br/>
+// types must be marked with the SerializableAttribute <br/>
+// attribute even if the type uses a custom <br/>
+// serialization routine through implementation of <br/>
+// the ISerializable interface.<br/>]]></description>
   </rule>
   <rule>
     <key>MarkAttributesWithAttributeusageattribute</key>
@@ -1869,7 +3480,26 @@ warnif count > 0 from t in Application.Types where
    t.DeriveFrom ("System.Attribute".AllowNoMatch()) &&
   !t.HasAttribute ("System.AttributeUsageAttribute".AllowNoMatch())
 ]]></code>
-    <description><![CDATA[Mark attributes with AttributeUsageAttribute]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in Application.Types where <br/>
+   t.DeriveFrom ("System.Attribute".AllowNoMatch()) &&<br/>
+  !t.HasAttribute ("System.AttributeUsageAttribute".AllowNoMatch())<br/>
+select t<br/>
+<br/>
+// When defining a custom attribute, mark it using <br/>
+// AttributeUsageAttribute to indicate where in the <br/>
+// source code the custom attribute can be applied.<br/>
+// An attribute's meaning and intended usage will <br/>
+// determine its valid locations in code. For example, <br/>
+// if you are defining an attribute that identifies <br/>
+// the person responsible for maintaining and enhancing <br/>
+// each type in a library, and responsibility is <br/>
+// always assigned at the type level, compilers should <br/>
+// allow the attribute on classes, enumerations, <br/>
+// and interfaces, but should not allow it on methods, <br/>
+// events, or properties. Organizational policies and<br/>
+// procedures would dictate whether the attribute <br/>
+// should be allowed on assemblies.<br/>]]></description>
   </rule>
   <rule>
     <key>RemoveCallsToGccollect</key>
@@ -1885,7 +3515,21 @@ let gcCollectMethods = ThirdParty.Methods.WithFullNameIn(
    "System.GC.Collect(Int32,GCCollectionMode)")
 from m in Application.Methods.UsingAny(gcCollectMethods)
 ]]></code>
-    <description><![CDATA[Remove calls to GC.Collect()]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 <br/>
+<br/>
+let gcCollectMethods = ThirdParty.Methods.WithFullNameIn(<br/>
+   "System.GC.Collect()",<br/>
+   "System.GC.Collect(Int32)",<br/>
+   "System.GC.Collect(Int32,GCCollectionMode)")<br/>
+<br/>
+from m in Application.Methods.UsingAny(gcCollectMethods)<br/>
+select m<br/>
+<br/>
+// It is preferrable to avoid calling GC.Collect() <br/>
+// explicitely in order to avoid some performance pitfall.<br/>
+// More in information on this here:<br/>
+// http://blogs.msdn.com/ricom/archive/2004/11/29/271829.aspx<br/>]]></description>
   </rule>
   <rule>
     <key>DontCallGccollectWithoutCallingGcwaitforpendingfinalizers</key>
@@ -1902,7 +3546,27 @@ let gcCollectMethods = ThirdParty.Methods.WithFullNameIn(
 from m in Application.Methods.UsingAny(gcCollectMethods) where
   !m.IsUsing ("System.GC.WaitForPendingFinalizers()".AllowNoMatch())
 ]]></code>
-    <description><![CDATA[Don't call GC.Collect() without calling GC.WaitForPendingFinalizers()]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 <br/>
+<br/>
+let gcCollectMethods = ThirdParty.Methods.WithFullNameIn(<br/>
+   "System.GC.Collect()",<br/>
+   "System.GC.Collect(Int32)",<br/>
+   "System.GC.Collect(Int32,GCCollectionMode)")<br/>
+<br/>
+from m in Application.Methods.UsingAny(gcCollectMethods) where<br/>
+  !m.IsUsing ("System.GC.WaitForPendingFinalizers()".AllowNoMatch())<br/>
+select new { m, m.NbLinesOfCode } <br/>
+<br/>
+// It is preferrable to avoid calling GC.Collect() <br/>
+// explicitely in order to avoid some performance <br/>
+// pitfall. But if you wish to call GC.Collect(), <br/>
+// you must do it this way:<br/>
+//   GC.Collect();<br/>
+//   GC.WaitForPendingFinalizers();<br/>
+//   GC.Collect();<br/>
+// To make sure that finalizer got executed, and <br/>
+// object with finalizer got cleaned properly.<br/>]]></description>
   </rule>
   <rule>
     <key>DoNotRaiseTooGeneralExceptionTypes</key>
@@ -1920,7 +3584,18 @@ warnif count > 0 from m in Application.Methods where
     m.CreateA("System.ApplicationException".AllowNoMatch()) ||
     m.CreateA("System.SystemException".AllowNoMatch()) )
 ]]></code>
-    <description><![CDATA[Do not raise too general exception types]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in Application.Methods where<br/>
+  // Test for non-constructor, else this rule <br/>
+  // would warn on ctor of classes that derive <br/>
+  // from these exception types.<br/>
+ !m.IsConstructor && (<br/>
+<br/>
+    m.CreateA("System.Exception".AllowNoMatch()) ||<br/>
+    m.CreateA("System.ApplicationException".AllowNoMatch()) ||<br/>
+    m.CreateA("System.SystemException".AllowNoMatch()) )<br/>
+select m<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>DoNotRaiseReservedExceptionTypes</key>
@@ -1944,7 +3619,24 @@ let reservedExceptions = ThirdParty.Types.WithFullNameIn(
 from m in Application.Methods.ThatCreateAny(reservedExceptions)
 let reservedExceptionsCreated = reservedExceptions.Where(t => m.IsUsing(t))
 ]]></code>
-    <description><![CDATA[Do not raise reserved exception types]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 <br/>
+<br/>
+let reservedExceptions = ThirdParty.Types.WithFullNameIn(   <br/>
+   "System.ExecutionEngineException",<br/>
+   "System.IndexOutOfRangeException",<br/>
+   "System.NullReferenceException",<br/>
+   "System.OutOfMemoryException",<br/>
+   "System.StackOverflowException",<br/>
+   "System.InvalidProgramException",<br/>
+   "System.AccessViolationException",<br/>
+   "System.CannotUnloadAppDomainException",<br/>
+   "System.BadImageFormatException",<br/>
+   "System.DataMisalignedException")<br/>
+<br/>
+from m in Application.Methods.ThatCreateAny(reservedExceptions)<br/>
+let reservedExceptionsCreated = reservedExceptions.Where(t => m.IsUsing(t))<br/>
+select new { m, reservedExceptionsCreated }<br/>]]></description>
   </rule>
   <rule>
     <key>UseIntegralOrStringArgumentForIndexers</key>
@@ -1960,7 +3652,27 @@ m.IsIndexerGetter &&
      m.NameLike (@"get_Item\(Byte") ||
      m.NameLike (@"get_Item\(SByte") )
 ]]></code>
-    <description><![CDATA[Use integral or string argument for indexers]]></description>
+    <description><![CDATA[<br/>
+from m in Application.Methods where <br/>
+m.IsIndexerGetter && <br/>
+ !( (m.Name == @"get_Item(String)") || <br/>
+     m.NameLike (@"get_Item\(Int") || <br/>
+     m.NameLike (@"get_Item\(Byte") ||<br/>
+     m.NameLike (@"get_Item\(SByte") )<br/>
+select m<br/>
+<br/>
+// Indexers, that is, indexed properties, <br/>
+// should use integer or string types for the index. <br/>
+// These types are typically used for indexing <br/>
+// data structures and increase the usability of <br/>
+// the library. Use of the Object type should be <br/>
+// restricted to those cases where the specific <br/>
+// integer or string type cannot be specified at <br/>
+// design time. If the design requires other <br/>
+// types for the index, reconsider whether the <br/>
+// type represents a logical data store. If it <br/>
+// does not represent a logical data store, <br/>
+// use a method.<br/>]]></description>
   </rule>
   <rule>
     <key>TypesShouldNotExtendSystemapplicationexception</key>
@@ -1972,7 +3684,17 @@ m.IsIndexerGetter &&
 warnif count > 0 from t in Application.Types where
   t.DeriveFrom("System.ApplicationException".AllowNoMatch())
 ]]></code>
-    <description><![CDATA[Types should not extend System.ApplicationException]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in Application.Types where<br/>
+  t.DeriveFrom("System.ApplicationException".AllowNoMatch())<br/>
+select t<br/>
+<br/>
+// For .NET Framework version 1, it was <br/>
+// recommended to derive new exceptions from <br/>
+// ApplicationException. The recommendation has <br/>
+// changed and new exceptions should derive <br/>
+// from System.Exception or one of its <br/>
+// subclasses in the System namespace.<br/>]]></description>
   </rule>
   <rule>
     <key>DontUsenetxHashtableAndArraylist</key>
@@ -1986,7 +3708,22 @@ let forbiddenTypes = ThirdParty.Types.WithFullNameIn("System.Collections.HashTab
 where forbiddenTypes.Count() > 0
 from m in Application.Methods.ThatCreateAny(forbiddenTypes)
 ]]></code>
-    <description><![CDATA[Don't use .NET 1.x HashTable and ArrayList]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 <br/>
+let forbiddenTypes = ThirdParty.Types.WithFullNameIn("System.Collections.HashTable", "System.Collections.ArrayList")<br/>
+where forbiddenTypes.Count() > 0<br/>
+from m in Application.Methods.ThatCreateAny(forbiddenTypes)<br/>
+select m<br/>
+<br/>
+// List<T> should be preferred over ArrayList.<br/>
+// It is generic hence you get strongly typed elements.<br/>
+// It is faster with T as a value types since it avoids boxing.<br/>
+// For the same reasons Dictionary<K,V> should be prevered over HashTable.<br/>
+<br/>
+// You can be forced to use HashTable or ArrayList <br/>
+// because you are using third party code that requires <br/>
+// working with these classes or because you are <br/>
+// coding with .NET 1.x.<br/>]]></description>
   </rule>
   <rule>
     <key>PinvokesShouldBeStaticAndNotBeVisible</key>
@@ -2001,7 +3738,23 @@ warnif count > 0 from m in Application.Methods where
   ( m.IsPublic ||
    !m.IsStatic)
 ]]></code>
-    <description><![CDATA[P/Invokes should be static and not be visible]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in Application.Methods where<br/>
+  !m.IsThirdParty &&<br/>
+  (m.HasAttribute ("System.Runtime.InteropServices.DllImportAttribute".AllowNoMatch())) &&<br/>
+  ( m.IsPublic || <br/>
+   !m.IsStatic)<br/>
+select new { m, m.Visibility, m.IsStatic }<br/>
+<br/>
+// Methods marked with the DllImportAttribute <br/>
+// attribute (or methods defined using the <br/>
+// Declare keyword in Visual Basic) use <br/>
+// Platform Invocation Services to access unmanaged <br/>
+// code. Such methods should not be exposed. Keeping <br/>
+// these methods private or internal ensures <br/>
+// that your library cannot be used to breach <br/>
+// security by allowing callers access to <br/>
+// unmanaged APIs they could not call otherwise.<br/>]]></description>
   </rule>
   <rule>
     <key>MovePinvokesToNativemethodsClass</key>
@@ -2014,7 +3767,44 @@ warnif count > 0 from m in Application.Methods where
    m.HasAttribute ("System.Runtime.InteropServices.DllImportAttribute".AllowNoMatch()) &&
    m.ParentType.Name != "NativeMethods"
 ]]></code>
-    <description><![CDATA[Move P/Invokes to NativeMethods class]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in Application.Methods where<br/>
+   m.HasAttribute ("System.Runtime.InteropServices.DllImportAttribute".AllowNoMatch()) &&<br/>
+   m.ParentType.Name != "NativeMethods"<br/>
+select m<br/>
+<br/>
+// Platform Invocation methods, such as those marked <br/>
+// with the System.Runtime.InteropServices.DllImportAttribute <br/>
+// attribute, or methods defined by using the Declare <br/>
+// keyword in Visual Basic, access unmanaged code. <br/>
+// These methods should be in one of the following classes:<br/>
+//<br/>
+//   - NativeMethods - This class does not suppress stack <br/>
+//     walks for unmanaged code permission. <br/>
+//     (System.Security.SuppressUnmanagedCodeSecurityAttribute <br/>
+//     must not be applied to this class.) <br/>
+//     This class is for methods that can be used <br/>
+//     anywhere because a stack walk will be performed.<br/>
+//<br/>
+//   - SafeNativeMethods - This class suppresses <br/>
+//     stack walks for unmanaged code permission. <br/>
+//     (System.Security.SuppressUnmanagedCodeSecurityAttribute <br/>
+//     is applied to this class.) <br/>
+//     This class is for methods that are safe <br/>
+//     for anyone to call. Callers of these methods <br/>
+//     are not required to do a full security review <br/>
+//     to ensure that the usage is secure because <br/>
+//     the methods are harmless for any caller.<br/>
+//<br/>
+//   - UnsafeNativeMethods - This class suppresses <br/>
+//     stack walks for unmanaged code permission. <br/>
+//     (System.Security.SuppressUnmanagedCodeSecurityAttribute <br/>
+//     is applied to this class.) This class is for <br/>
+//     methods that are potentially dangerous. Any <br/>
+//     caller of these methods must do a full security <br/>
+//     review to ensure that the usage is secure because <br/>
+//     no stack walk will be performed.<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>NativemethodsClassShouldBeStaticAndInternal</key>
@@ -2027,7 +3817,15 @@ warnif count > 0 from t in Application.Types.WithNameIn(
    @"NativeMethods", "SafeNativeMethods", "UnsafeNativeMethods") where
   t.IsPublic || !t.IsStatic
 ]]></code>
-    <description><![CDATA[NativeMethods class should be static and internal]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in Application.Types.WithNameIn(<br/>
+   @"NativeMethods", "SafeNativeMethods", "UnsafeNativeMethods") where<br/>
+  t.IsPublic || !t.IsStatic<br/>
+select new { t, t.Visibility, t.IsStatic }<br/>
+<br/>
+// Native Methods' classes are declared as internal <br/>
+// (Friend, in Visual Basic) and static.<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>MethodNonsynchronizedThatReadMutableStates</key>
@@ -2041,7 +3839,21 @@ from m in Application.Methods where
  !m.IsUsing ("System.Threading.Monitor".AllowNoMatch()) &&
  !m.IsUsing ("System.Threading.ReaderWriterLock".AllowNoMatch())
 ]]></code>
-    <description><![CDATA[Method non-synchronized that read mutable states]]></description>
+    <description><![CDATA[<br/>
+from m in Application.Methods where <br/>
+ (m.ReadsMutableObjectState || m.ReadsMutableTypeState) && <br/>
+ !m.IsUsing ("System.Threading.Monitor".AllowNoMatch()) && <br/>
+ !m.IsUsing ("System.Threading.ReaderWriterLock".AllowNoMatch())<br/>
+select new { m, mutableFieldsUsed = m.FieldsUsed.Where(f => !f.IsImmutable) }<br/>
+<br/>
+// Mutable object states are instance fields that <br/>
+// can be modifed throught the lifetime of the object.<br/>
+// Mutable type states are static fields that can be <br/>
+// modifed throught the lifetime of the program.<br/>
+// This query lists methods that read mutable state <br/>
+// without synchronizing access. In the case of <br/>
+// multi-threaded program, doing so can lead to <br/>
+// state corruption.<br/>]]></description>
   </rule>
   <rule>
     <key>DontCreateThreadsExplicitely</key>
@@ -2053,7 +3865,26 @@ from m in Application.Methods where
 warnif count > 0 from m in Application.Methods where
   m.CreateA ("System.Threading.Thread".AllowNoMatch())
 ]]></code>
-    <description><![CDATA[Don't create threads explicitely]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from m in Application.Methods where <br/>
+  m.CreateA ("System.Threading.Thread".AllowNoMatch())<br/>
+select m<br/>
+<br/>
+// Prefer using the thread pool instead of <br/>
+// creating manually your own thread.<br/>
+// Threads are costly objects. <br/>
+// They take approximately 200,000 cycles to <br/>
+// create and about 100,000 cycles to destroy.  <br/>
+// By default they reserve 1 megabyte of virtual <br/>
+// memory for its stack and use 2,000-8,000 <br/>
+// cycles for each context switch.<br/>
+// As a consequence, it is preferrable to let <br/>
+// the thread pool recycle threads.<br/>
+<br/>
+// Creating custom thread can also be the <br/>
+// sign of flawed design, where tasks and <br/>
+// threads have affinity. It is preferrable <br/>
+// to code tasks that can be ran on any thread.<br/>]]></description>
   </rule>
   <rule>
     <key>DontUseDangerousThreadingMethods</key>
@@ -2081,7 +3912,33 @@ let wrongMethods = ThirdParty.Methods.WithFullNameIn(
 )
 from m in Application.Methods.UsingAny(wrongMethods)
 ]]></code>
-    <description><![CDATA[Don't use dangerous threading methods]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 <br/>
+<br/>
+let wrongMethods = ThirdParty.Methods.WithFullNameIn(<br/>
+<br/>
+  // Usage of Thread.Abort() is dangerous.<br/>
+  // More information on this here:<br/>
+  // http://www.interact-sw.co.uk/iangblog/2004/11/12/cancellation<br/>
+  "System.Threading.Thread.Abort()",<br/>
+  "System.Threading.Thread.Abort(Object)",<br/>
+     <br/>
+  // Usage of Thread.Sleep() is a sign of <br/>
+  // flawed design. More information on this here:<br/>
+  // http://msmvps.com/blogs/peterritchie/archive/2007/04/26/thread-sleep-is-a-sign-of-a-poorly-designed-program.aspx<br/>
+  "System.Threading.Thread.Sleep(Int32)",<br/>
+<br/>
+  // Suspend() and Resume() are dangerous threading methods, marked as obsolete.<br/>
+  // More information on workaround here:<br/>
+  // http://stackoverflow.com/questions/382173/what-are-alternative-ways-to-suspend-and-resume-a-thread<br/>
+  "System.Threading.Thread.Suspend()",<br/>
+  "System.Threading.Thread.Resume()"<br/>
+)<br/>
+<br/>
+from m in Application.Methods.UsingAny(wrongMethods)<br/>
+select new { m, calls = m.MethodsCalled.Intersect(wrongMethods) }<br/>
+<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>MonitorTryenterexitMustBeBothCalledWithinTheSameMethod</key>
@@ -2098,7 +3955,17 @@ let enterMethods = ThirdParty.Methods.WithFullNameWildcardMatchIn(
 from m in Application.Methods.UsingAny(enterMethods) where
  !m.IsUsing ("System.Threading.Monitor.Exit(Object)".AllowNoMatch())
 ]]></code>
-    <description><![CDATA[Monitor TryEnter/Exit must be both called within the same method]]></description>
+    <description><![CDATA[<br/>
+// Else you expose yourself to complex error-prone scenarios.<br/>
+warnif count > 0 <br/>
+<br/>
+let enterMethods = ThirdParty.Methods.WithFullNameWildcardMatchIn(<br/>
+   "System.Threading.Monitor.Enter(*",<br/>
+   "System.Threading.Monitor.TryEnter(*")<br/>
+<br/>
+from m in Application.Methods.UsingAny(enterMethods) where<br/>
+ !m.IsUsing ("System.Threading.Monitor.Exit(Object)".AllowNoMatch())<br/>
+select new { m, enterMethodsCalled = m.MethodsCalled.Intersect(enterMethods) }<br/>]]></description>
   </rule>
   <rule>
     <key>ReaderwriterlockAcquirereaderwriterlockreleaselockMustBeBothCalledWithinTheSameMethod</key>
@@ -2115,7 +3982,17 @@ from m in Application.Methods.UsingAny(acquireLockMethods) where
  !m.IsUsing ("System.Threading.ReaderWriterLock.ReleaseReaderLock()".AllowNoMatch()) &&
  !m.IsUsing ("System.Threading.ReaderWriterLock.ReleaseLock()".AllowNoMatch())
 ]]></code>
-    <description><![CDATA[ReaderWriterLock Acquire[Reader/Writer]Lock/ReleaseLock must be both called within the same method]]></description>
+    <description><![CDATA[<br/>
+// Else you expose yourself to complex error-prone scenarios.<br/>
+warnif count > 0 <br/>
+<br/>
+let acquireLockMethods = ThirdParty.Methods.WithFullNameWildcardMatch(<br/>
+    "System.Threading.ReaderWriterLock.AcquireReaderLock(*")<br/>
+<br/>
+from m in Application.Methods.UsingAny(acquireLockMethods) where<br/>
+ !m.IsUsing ("System.Threading.ReaderWriterLock.ReleaseReaderLock()".AllowNoMatch()) &&<br/>
+ !m.IsUsing ("System.Threading.ReaderWriterLock.ReleaseLock()".AllowNoMatch())<br/>
+select new { m, acquireLockMethods = m.MethodsCalled.Intersect(acquireLockMethods) }<br/>]]></description>
   </rule>
   <rule>
     <key>MethodShouldNotReturnConcreteXmlnode</key>
@@ -2135,7 +4012,25 @@ let concreteXmlTypes = ThirdParty.Types.WithFullNameIn(
        "System.Xml.XmlNode")
 from m in Application.Methods.WithReturnTypeIn(concreteXmlTypes)
 ]]></code>
-    <description><![CDATA[Method should not return concrete XmlNode]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 <br/>
+<br/>
+let concreteXmlTypes = ThirdParty.Types.WithFullNameIn(<br/>
+       "System.Xml.XmlDocument",<br/>
+       "System.Xml.XmlAttribute",<br/>
+       "System.Xml.XmlDocumentFragment",<br/>
+       "System.Xml.XmlEntity",<br/>
+       "System.Xml.XmlLinkedNode",<br/>
+       "System.Xml.XmlNotation",<br/>
+       "System.Xml.XmlNode")<br/>
+<br/>
+from m in Application.Methods.WithReturnTypeIn(concreteXmlTypes)<br/>
+select new { m, m.ReturnType }<br/>
+<br/>
+// The class System.Xml.XmlNode implements the interface <br/>
+// System.Xml.Xpath.IXPathNavigable. It is preferrable <br/>
+// to return this interface instead of a concrete class.<br/>
+<br/>]]></description>
   </rule>
   <rule>
     <key>TypesShouldNotExtendSystemxmlxmldocument</key>
@@ -2147,7 +4042,14 @@ from m in Application.Methods.WithReturnTypeIn(concreteXmlTypes)
 warnif count > 0 from t in Application.Types where
   t.DeriveFrom("System.Xml.XmlDocument".AllowNoMatch())
 ]]></code>
-    <description><![CDATA[Types should not extend System.Xml.XmlDocument]]></description>
+    <description><![CDATA[<br/>
+warnif count > 0 from t in Application.Types where<br/>
+  t.DeriveFrom("System.Xml.XmlDocument".AllowNoMatch())<br/>
+select t<br/>
+<br/>
+// Do not create a subclass of XmlDocument if you want <br/>
+// to create an XML view of an underlying object <br/>
+// model or data source.<br/>]]></description>
   </rule>
   <rule>
     <key>DiscardGeneratedTypesFromJustmycode</key>
@@ -2176,7 +4078,34 @@ from t in Application.Types where
   (t.SourceFileDeclAvailable &&
    t.SourceDecls.All(s => s.SourceFile.FilePath.ParentDirectoryPath.ToString().ToLower().Contains("generated")))
 ]]></code>
-    <description><![CDATA[Discard generated Types from JustMyCode]]></description>
+    <description><![CDATA[<br/>
+// --- Make sure to make this query richer to discard generated types from NDepend rules results ---<br/>
+notmycode<br/>
+from t in Application.Types where<br/>
+<br/>
+  // Resources, Settings, or typed DataSet generated types for example, are tagged with this attribute<br/>
+  t.HasAttribute ("System.CodeDom.Compiler.GeneratedCodeAttribute".AllowNoMatch()) ||<br/>
+<br/>
+  // This attributes identifies a type or member that is not part of the user code for an application.<br/>
+  t.HasAttribute ("System.Diagnostics.DebuggerNonUserCodeAttribute".AllowNoMatch()) ||<br/>
+<br/>
+  // Delegate types are always generated<br/>
+  t.IsDelegate ||<br/>
+<br/>
+  // Discard ASP.NET page types generated by aspnet_compiler.exe<br/>
+  // See: http://www.ndepend.com/FAQ.aspx#ASPNET<br/>
+  t.ParentNamespace.Name.EqualsAny("ASP", "__ASP") ||<br/>
+<br/>
+  // Discard generated type ContractException<br/>
+  t.Name == "__ContractsRuntime+ContractException" ||<br/>
+  t.FullName == "System.Diagnostics.Contracts.RuntimeContractsAttribute" ||<br/>
+  t.FullName == "System.Diagnostics.Contracts.__ContractsRuntime" ||<br/>
+<br/>
+  // Discard all types declared in a folder path containing the word "generated"<br/>
+  (t.SourceFileDeclAvailable &&<br/>
+   t.SourceDecls.All(s => s.SourceFile.FilePath.ParentDirectoryPath.ToString().ToLower().Contains("generated")))<br/>
+<br/>
+select new { t, t.NbLinesOfCode }<br/>]]></description>
   </rule>
   <rule>
     <key>MostUsedTypesrank</key>
@@ -2187,7 +4116,16 @@ from t in Application.Types where
     <code><![CDATA[
 (from t in Application.Types orderby t.Rank descending
  ]]></code>
-    <description><![CDATA[Most used types (Rank)]]></description>
+    <description><![CDATA[<br/>
+(from t in Application.Types orderby t.Rank descending<br/>
+ select new { t, t.Rank }).Take(50)<br/>
+<br/>
+// TypeRank values are computed by applying <br/>
+// the Google PageRank  algorithm on the <br/>
+// graph of types' dependencies. Types with <br/>
+// high Rank are the most used ones.<br/>
+// See the definition of the TypeRank metric here: <br/>
+// http://www.ndepend.com/Metrics.aspx#TypeRank<br/>]]></description>
   </rule>
   <rule>
     <key>MostUsedMethodsrank</key>
@@ -2198,7 +4136,16 @@ from t in Application.Types where
     <code><![CDATA[
 (from m in Application.Methods orderby m.Rank descending
  ]]></code>
-    <description><![CDATA[Most used methods (Rank)]]></description>
+    <description><![CDATA[<br/>
+(from m in Application.Methods orderby m.Rank descending<br/>
+ select new { m, m.Rank }).Take(50)<br/>
+<br/>
+// MethodRank values are computed by applying <br/>
+// the Google PageRank  algorithm on the graph of <br/>
+// methods' dependencies. Methods with high Rank <br/>
+// are the most used ones. See the definition of <br/>
+// the MethodRank metric here:<br/>
+// http://www.ndepend.com/Metrics.aspx#MethodRank<br/>]]></description>
   </rule>
   <rule>
     <key>MostUsedTypestypesusingme</key>
@@ -2209,7 +4156,9 @@ from t in Application.Types where
     <code><![CDATA[
 (from t in Types orderby t.NbTypesUsingMe descending
  ]]></code>
-    <description><![CDATA[Most used types (#TypesUsingMe )]]></description>
+    <description><![CDATA[<br/>
+(from t in Types orderby t.NbTypesUsingMe descending<br/>
+ select new { t, t.TypesUsingMe }).Take(50)<br/>]]></description>
   </rule>
   <rule>
     <key>MostUsedMethodsmethodscallingme</key>
@@ -2220,7 +4169,9 @@ from t in Application.Types where
     <code><![CDATA[
 (from m in Methods orderby m.NbMethodsCallingMe descending
  ]]></code>
-    <description><![CDATA[Most used methods (#MethodsCallingMe )]]></description>
+    <description><![CDATA[<br/>
+(from m in Methods orderby m.NbMethodsCallingMe descending<br/>
+ select new { m, m.MethodsCallingMe }).Take(50)<br/>]]></description>
   </rule>
   <rule>
     <key>TypesThatUseManyOtherTypestypesused</key>
@@ -2231,7 +4182,9 @@ from t in Application.Types where
     <code><![CDATA[
 (from t in Application.Types orderby t.NbTypesUsed descending
  ]]></code>
-    <description><![CDATA[Types that use many other types (#TypesUsed )]]></description>
+    <description><![CDATA[<br/>
+(from t in Application.Types orderby t.NbTypesUsed descending<br/>
+ select new { t, t.TypesUsed }).Take(50)<br/>]]></description>
   </rule>
   <rule>
     <key>MethodsThatUseManyOtherMethodsmethodscalled</key>
@@ -2242,7 +4195,9 @@ from t in Application.Types where
     <code><![CDATA[
 (from m in Application.Methods orderby m.NbMethodsCalled descending
  ]]></code>
-    <description><![CDATA[Methods that use many other methods (#MethodsCalled )]]></description>
+    <description><![CDATA[<br/>
+(from m in Application.Methods orderby m.NbMethodsCalled descending<br/>
+ select new { m, m.MethodsCalled }).Take(50)<br/>]]></description>
   </rule>
   <rule>
     <key>HighlevelToLowlevelTypeslevel</key>
@@ -2253,7 +4208,13 @@ from t in Application.Types where
     <code><![CDATA[
 from t in Application.Types orderby t.Level descending
 ]]></code>
-    <description><![CDATA[High-level to low-level types (Level)]]></description>
+    <description><![CDATA[<br/>
+from t in Application.Types orderby t.Level descending<br/>
+select new { t, t.Level }<br/>
+<br/>
+// Classify types by their Level values.<br/>
+// See the definition of the TypeLevel metric here:<br/>
+// http://www.ndepend.com/Metrics.aspx#Level<br/>]]></description>
   </rule>
   <rule>
     <key>HighlevelToLowlevelMethodslevel</key>
@@ -2264,6 +4225,12 @@ from t in Application.Types orderby t.Level descending
     <code><![CDATA[
 from m in Application.Methods orderby m.Level descending
 ]]></code>
-    <description><![CDATA[High-level to low-level methods (Level)]]></description>
+    <description><![CDATA[<br/>
+from m in Application.Methods orderby m.Level descending<br/>
+select new { m, m.Level }<br/>
+<br/>
+// Classify methods by their Level values.<br/>
+// See the definition of the MethodLevel metric here:<br/>
+// http://www.ndepend.com/Metrics.aspx#Level<br/>]]></description>
   </rule>
 </rules>

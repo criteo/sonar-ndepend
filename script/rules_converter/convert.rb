@@ -39,6 +39,7 @@ def query2rule(query)
   content = query.content
   name = content[/.*<Name>(.*)<\/Name>.*/, 1]
   raise "No name found. Note we don't parse <TrendMetric Name=\"...\" /> as we want only boolean rules." unless name
+  raise "Exclude 'quick summaries' as it aggregates other rules." if name.start_with?("Quick summary")
 
   key = name.split.map(&:capitalize).join(' ').tr('^A-Za-z', "")
 
@@ -56,11 +57,11 @@ def query2rule(query)
   raise "Invalid 'from x' clause" unless content[/from #{scope.downcase[0]} /]
 
   # Remove 'Name' tag as it will be added by the sonar-ndepend plugin.
-  code = content.gsub(/^.*<\/Name>(.*)/m, '\1') \
-    # Remove 'select' as it will be added by the sonar-ndepend plugin.
-    .gsub(/(.*)select .*/m, '\1')
+  content_without_name = content.gsub(/^.*<\/Name>(.*)/m, '\1')
+  # Remove 'select' as it will be added by the sonar-ndepend plugin.
+  code = content_without_name.gsub(/(.*)select .*/m, '\1')
 
-  description = name # Maybe we could parse all lines prefixed by "//" instead
+  description = content_without_name.gsub(/$/, '<br/>')
 
   return Rule.new(name, key, severity, group, scope, code, description)
 end
