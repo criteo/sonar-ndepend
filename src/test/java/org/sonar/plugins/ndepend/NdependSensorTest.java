@@ -24,6 +24,7 @@ import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.batch.sensor.internal.DefaultSensorDescriptor;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.config.Settings;
+import org.sonar.api.rules.RuleFinder;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -35,12 +36,13 @@ public class NdependSensorTest {
   public void testSensorHasRightProperties() {
     SensorDescriptor descriptor = mock(DefaultSensorDescriptor.class);
     ResourcePerspectives perspectives = mock(ResourcePerspectives.class);
+    RuleFinder ruleFinder = mock(RuleFinder.class);
 
     when(descriptor.createIssuesForRuleRepositories("cs-ndepend")).thenReturn(descriptor);
     when(descriptor.workOnFileTypes(InputFile.Type.MAIN, InputFile.Type.TEST)).thenReturn(
       descriptor);
     when(descriptor.workOnLanguages("cs")).thenReturn(descriptor);
-    new NdependSensor(new Settings(), new DefaultFileSystem(), perspectives).describe(descriptor);
+    new NdependSensor(new Settings(), new DefaultFileSystem(), perspectives, ruleFinder).describe(descriptor);
     verify(descriptor).workOnLanguages("cs");
     verify(descriptor).createIssuesForRuleRepositories("cs-ndepend");
     verify(descriptor).workOnFileTypes(InputFile.Type.MAIN, InputFile.Type.TEST);
