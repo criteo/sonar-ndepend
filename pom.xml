@@ -10,12 +10,12 @@
 
   <groupId>org.codehaus.sonar-plugins.ndpend</groupId>
   <artifactId>sonar-ndepend-plugin</artifactId>
-  <version>0.1-SNAPSHOT</version>
+  <version>1.0</version>
   <packaging>sonar-plugin</packaging>
 
   <name>SonarQube NDepend Plugin</name>
   <description>Enables the use of NDepend in sonar.</description>
-  <url>http://docs.codehaus.org/display/SONAR/ReSharper+Plugin</url>
+  <url>http://docs.codehaus.org/display/SONAR/.NET-specific+plugins</url>
   <inceptionYear>2014</inceptionYear>
   <organization>
     <name>Criteo</name>
