@@ -32,7 +32,7 @@ public class QueryXmlSerializer {
     + ": \"\"\n";
 
   private static final String DeclareLine = "let line = %s.SourceDecls.Count() > 0 ? "
-    + "%s.SourceDecls.First().Line : 1\n";
+    + "%s.SourceDecls.First().Line.ToString() : \"1\"\n";
 
   /**
    * A document, that we can call createElement on. Note that this code doesn't
