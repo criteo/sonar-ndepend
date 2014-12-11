@@ -19,7 +19,7 @@
   <inceptionYear>2014</inceptionYear>
   <organization>
     <name>Criteo</name>
-    <url>http://www.criteolabs.com</url>
+    <url>http://labs.criteo.com</url>
   </organization>
   <licenses>
     <license>
@@ -33,22 +33,22 @@
     <developer>
       <id>p.bruneton</id>
       <name>Patrick Bruneton</name>
-      <organization>http://www.labs.criteo.com</organization>
+      <organization>http://labs.criteo.com</organization>
     </developer>
     <developer>
       <id>cupcicm</id>
       <name>Manu Cupcic</name>
-      <organization>http://www.labs.criteo.com</organization>
+      <organization>http://labs.criteo.com</organization>
     </developer>
     <developer>
       <id>debanne</id>
       <name>Emmanuel Debanne</name>
-      <organization>http://www.labs.criteo.com</organization>
+      <organization>http://labs.criteo.com</organization>
     </developer>
     <developer>
       <id>dopushk3</id>
       <name>Francois Visconte</name>
-      <organization>http://www.labs.criteo.com</organization>
+      <organization>http://labs.criteo.com</organization>
     </developer>
   </developers>
   <scm>
