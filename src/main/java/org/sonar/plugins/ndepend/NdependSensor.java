@@ -20,15 +20,19 @@ package org.sonar.plugins.ndepend;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonar.api.batch.Sensor;
+import org.sonar.api.batch.SensorContext;
+import org.sonar.api.batch.fs.FilePredicate;
+import org.sonar.api.batch.fs.FilePredicates;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.sensor.Sensor;
-import org.sonar.api.batch.sensor.SensorContext;
-import org.sonar.api.batch.sensor.SensorDescriptor;
+import org.sonar.api.batch.fs.InputFile.Type;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.config.Settings;
 import org.sonar.api.issue.Issuable;
 import org.sonar.api.issue.Issue;
+import org.sonar.api.profiles.RulesProfile;
+import org.sonar.api.resources.Project;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.api.rules.Rule;
 import org.sonar.api.rules.RuleFinder;
@@ -52,12 +56,14 @@ public class NdependSensor implements Sensor {
   private final FileSystem fileSystem;
   private final ResourcePerspectives perspectives;
   private final RuleFinder ruleFinder;
+  private RulesProfile profile;
 
-  public NdependSensor(Settings settings, FileSystem fileSystem, ResourcePerspectives perspectives, RuleFinder ruleFinder) {
+  public NdependSensor(Settings settings, FileSystem fileSystem, ResourcePerspectives perspectives, RuleFinder ruleFinder, RulesProfile profile) {
     this.settings = settings;
     this.fileSystem = fileSystem;
     this.perspectives = perspectives;
     this.ruleFinder = ruleFinder;
+    this.profile = profile;
   }
 
   private File getNdProjFile(FileSystem filesystem) {
@@ -65,10 +71,10 @@ public class NdependSensor implements Sensor {
   }
 
   @Override
-  public void execute(SensorContext context) {
+  public void analyse(Project project, SensorContext context) {
     LOG.debug("Executing NDepend sensor...");
-    File ndprojFile = getNdProjFile(context.fileSystem());
-    NdprojCreator creator = new NdprojCreator(settings, context.fileSystem());
+    File ndprojFile = getNdProjFile(fileSystem);
+    NdprojCreator creator = new NdprojCreator(settings, fileSystem);
     try {
       if (!creator.create(ndprojFile)) {
         return;
@@ -94,12 +100,24 @@ public class NdependSensor implements Sensor {
   }
 
   @Override
-  public void describe(SensorDescriptor descriptor) {
-    LOG.debug("Describing NDepend sensor...");
-    descriptor.createIssuesForRuleRepositories(NdependConfig.REPOSITORY_KEY)
-      .workOnFileTypes(InputFile.Type.MAIN, InputFile.Type.TEST)
-      .workOnLanguages(NdependConfig.LANGUAGE_KEY)
-      .name("NDepend");
+  public boolean shouldExecuteOnProject(Project project) {
+    boolean shouldExecute;
+    if (!hasFilesToAnalyze()) {
+      shouldExecute = false;
+    } else if (profile.getActiveRulesByRepository(NdependConfig.REPOSITORY_KEY).isEmpty()) {
+      LOG.info("All NDepend rules are disabled, skipping its execution.");
+      shouldExecute = false;
+    } else {
+      shouldExecute = true;
+    }
+    return shouldExecute;
+  }
+
+  private boolean hasFilesToAnalyze() {
+    FilePredicates predicates = fileSystem.predicates();
+    FilePredicate sourcesPredicate = predicates.or(predicates.hasType(Type.MAIN), predicates.hasType(Type.TEST));
+    FilePredicate languagePredicate = predicates.hasLanguage(NdependConfig.LANGUAGE_KEY);
+    return fileSystem.hasFiles(predicates.and(sourcesPredicate, languagePredicate));
   }
 
   private void analyzeResults(SensorContext context) {

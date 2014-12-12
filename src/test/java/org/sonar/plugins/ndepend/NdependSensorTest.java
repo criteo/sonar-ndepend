@@ -17,34 +17,45 @@
  */
 package org.sonar.plugins.ndepend;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Test;
-import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.fs.internal.DefaultFileSystem;
-import org.sonar.api.batch.sensor.SensorDescriptor;
-import org.sonar.api.batch.sensor.internal.DefaultSensorDescriptor;
+import org.mockito.Mockito;
+import org.sonar.api.batch.fs.FilePredicate;
+import org.sonar.api.batch.fs.FilePredicates;
+import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.config.Settings;
+import org.sonar.api.profiles.RulesProfile;
+import org.sonar.api.resources.Project;
+import org.sonar.api.rules.ActiveRule;
 import org.sonar.api.rules.RuleFinder;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class NdependSensorTest {
 
   @Test
-  public void testSensorHasRightProperties() {
-    SensorDescriptor descriptor = mock(DefaultSensorDescriptor.class);
+  public void testShouldExecuteOnProject() {
+    Settings settings = mock(Settings.class);
+    FileSystem fileSystem = mock(FileSystem.class);
     ResourcePerspectives perspectives = mock(ResourcePerspectives.class);
+    RulesProfile profile = mock(RulesProfile.class);
     RuleFinder ruleFinder = mock(RuleFinder.class);
+    Project project = mock(Project.class);
+    NdependSensor sensor = new NdependSensor(settings, fileSystem, perspectives, ruleFinder, profile);
+    when(fileSystem.predicates()).thenReturn(mock(FilePredicates.class));
 
-    when(descriptor.createIssuesForRuleRepositories("cs-ndepend")).thenReturn(descriptor);
-    when(descriptor.workOnFileTypes(InputFile.Type.MAIN, InputFile.Type.TEST)).thenReturn(
-      descriptor);
-    when(descriptor.workOnLanguages("cs")).thenReturn(descriptor);
-    new NdependSensor(new Settings(), new DefaultFileSystem(), perspectives, ruleFinder).describe(descriptor);
-    verify(descriptor).workOnLanguages("cs");
-    verify(descriptor).createIssuesForRuleRepositories("cs-ndepend");
-    verify(descriptor).workOnFileTypes(InputFile.Type.MAIN, InputFile.Type.TEST);
+    when(fileSystem.hasFiles(Mockito.any(FilePredicate.class))).thenReturn(false);
+    assertThat(sensor.shouldExecuteOnProject(project)).isFalse();
+
+    when(fileSystem.hasFiles(Mockito.any(FilePredicate.class))).thenReturn(true);
+    when(profile.getActiveRulesByRepository("cs-ndepend")).thenReturn(ImmutableList.<ActiveRule>of());
+    assertThat(sensor.shouldExecuteOnProject(project)).isFalse();
+
+    when(fileSystem.hasFiles(Mockito.any(FilePredicate.class))).thenReturn(true);
+    when(profile.getActiveRulesByRepository("cs-ndepend")).thenReturn(ImmutableList.of(mock(ActiveRule.class)));
+    assertThat(sensor.shouldExecuteOnProject(project)).isTrue();
   }
 }
