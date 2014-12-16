@@ -23,10 +23,8 @@ import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.batch.fs.FilePredicate;
-import org.sonar.api.batch.fs.FilePredicates;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.fs.InputFile.Type;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.config.Settings;
 import org.sonar.api.issue.Issuable;
@@ -114,10 +112,8 @@ public class NdependSensor implements Sensor {
   }
 
   private boolean hasFilesToAnalyze() {
-    FilePredicates predicates = fileSystem.predicates();
-    FilePredicate sourcesPredicate = predicates.or(predicates.hasType(Type.MAIN), predicates.hasType(Type.TEST));
-    FilePredicate languagePredicate = predicates.hasLanguage(NdependConfig.LANGUAGE_KEY);
-    return fileSystem.hasFiles(predicates.and(sourcesPredicate, languagePredicate));
+    FilePredicate languagePredicate = fileSystem.predicates().hasLanguage(NdependConfig.LANGUAGE_KEY);
+    return fileSystem.hasFiles(languagePredicate);
   }
 
   private void analyzeResults(SensorContext context) {
