@@ -28,7 +28,6 @@ import org.sonar.api.config.Settings;
 import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.resources.Project;
 import org.sonar.api.rules.ActiveRule;
-import org.sonar.api.rules.RuleFinder;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -42,9 +41,8 @@ public class NdependSensorTest {
     FileSystem fileSystem = mock(FileSystem.class);
     ResourcePerspectives perspectives = mock(ResourcePerspectives.class);
     RulesProfile profile = mock(RulesProfile.class);
-    RuleFinder ruleFinder = mock(RuleFinder.class);
     Project project = mock(Project.class);
-    NdependSensor sensor = new NdependSensor(settings, fileSystem, perspectives, ruleFinder, profile);
+    NdependSensor sensor = new NdependSensor(settings, fileSystem, perspectives, profile);
     when(fileSystem.predicates()).thenReturn(mock(FilePredicates.class));
 
     when(fileSystem.hasFiles(Mockito.any(FilePredicate.class))).thenReturn(false);

@@ -31,9 +31,8 @@ import org.sonar.api.issue.Issuable;
 import org.sonar.api.issue.Issue;
 import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.resources.Project;
-import org.sonar.api.rule.RuleKey;
+import org.sonar.api.rules.ActiveRule;
 import org.sonar.api.rules.Rule;
-import org.sonar.api.rules.RuleFinder;
 import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.plugins.ndepend.ndproj.CsProjectParseError;
@@ -53,14 +52,12 @@ public class NdependSensor implements Sensor {
   private final Settings settings;
   private final FileSystem fileSystem;
   private final ResourcePerspectives perspectives;
-  private final RuleFinder ruleFinder;
   private RulesProfile profile;
 
-  public NdependSensor(Settings settings, FileSystem fileSystem, ResourcePerspectives perspectives, RuleFinder ruleFinder, RulesProfile profile) {
+  public NdependSensor(Settings settings, FileSystem fileSystem, ResourcePerspectives perspectives, RulesProfile profile) {
     this.settings = settings;
     this.fileSystem = fileSystem;
     this.perspectives = perspectives;
-    this.ruleFinder = ruleFinder;
     this.profile = profile;
   }
 
@@ -137,12 +134,12 @@ public class NdependSensor implements Sensor {
           continue;
         }
         Issuable issuable = this.perspectives.as(Issuable.class, org.sonar.api.resources.File.create(file.relativePath()));
-        RuleKey ruleKey = RuleKey.of(NdependConfig.REPOSITORY_KEY, issue.getRuleKey());
-        Rule rule = ruleFinder.findByKey(ruleKey);
+        ActiveRule activeRule = profile.getActiveRule(NdependConfig.REPOSITORY_KEY, issue.getRuleKey());
+        Rule rule = activeRule.getRule();
         Issue sonarIssue = issuable.newIssueBuilder()
           .line(issue.getLine())
           .message(rule.getName())
-          .ruleKey(ruleKey)
+          .ruleKey(rule.ruleKey())
           .build();
         issuable.addIssue(sonarIssue);
       } catch (IOException e) {
