@@ -23,11 +23,11 @@ import org.mockito.Mockito;
 import org.sonar.api.batch.fs.FilePredicate;
 import org.sonar.api.batch.fs.FilePredicates;
 import org.sonar.api.batch.fs.FileSystem;
+import org.sonar.api.batch.rule.ActiveRule;
+import org.sonar.api.batch.rule.ActiveRules;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.config.Settings;
-import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.resources.Project;
-import org.sonar.api.rules.ActiveRule;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -40,20 +40,20 @@ public class NdependSensorTest {
     Settings settings = mock(Settings.class);
     FileSystem fileSystem = mock(FileSystem.class);
     ResourcePerspectives perspectives = mock(ResourcePerspectives.class);
-    RulesProfile profile = mock(RulesProfile.class);
+    ActiveRules activeRules = mock(ActiveRules.class);
     Project project = mock(Project.class);
-    NdependSensor sensor = new NdependSensor(settings, fileSystem, perspectives, profile);
+    NdependSensor sensor = new NdependSensor(settings, fileSystem, perspectives, activeRules);
     when(fileSystem.predicates()).thenReturn(mock(FilePredicates.class));
 
     when(fileSystem.hasFiles(Mockito.any(FilePredicate.class))).thenReturn(false);
     assertThat(sensor.shouldExecuteOnProject(project)).isFalse();
 
     when(fileSystem.hasFiles(Mockito.any(FilePredicate.class))).thenReturn(true);
-    when(profile.getActiveRulesByRepository("cs-ndepend")).thenReturn(ImmutableList.<ActiveRule>of());
+    when(activeRules.findByRepository("cs-ndepend")).thenReturn(ImmutableList.<ActiveRule>of());
     assertThat(sensor.shouldExecuteOnProject(project)).isFalse();
 
     when(fileSystem.hasFiles(Mockito.any(FilePredicate.class))).thenReturn(true);
-    when(profile.getActiveRulesByRepository("cs-ndepend")).thenReturn(ImmutableList.of(mock(ActiveRule.class)));
+    when(activeRules.findByRepository("cs-ndepend")).thenReturn(ImmutableList.of(mock(ActiveRule.class)));
     assertThat(sensor.shouldExecuteOnProject(project)).isTrue();
   }
 }
