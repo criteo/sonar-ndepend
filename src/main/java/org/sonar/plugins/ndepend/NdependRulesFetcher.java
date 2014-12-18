@@ -18,15 +18,13 @@
 package org.sonar.plugins.ndepend;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.VFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.config.Settings;
 import org.sonar.plugins.ndepend.ndproj.NdprojCreator;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -53,17 +51,15 @@ public class NdependRulesFetcher {
   }
 
   private byte[] fetch() throws IOException {
-    String rulesUrl = settings.getString(NdependConfig.NDEPEND_RULES_URL_KEY);
-    LOG.info("Fetching rules from {}", rulesUrl);
+    String rulesFile = settings.getString(NdependConfig.NDEPEND_RULES_PATH_KEY);
+    LOG.info("Fetching rules from {}", rulesFile);
     InputStream in;
-    if (rulesUrl == null || rulesUrl.trim().isEmpty()) {
+    if (rulesFile == null || rulesFile.trim().isEmpty()) {
       LOG.info("No rules configured. Using default rules from {}.", getClass().getResource(NdependRulesDefinition.RULES_RESOURCE).toString());
       in = getClass().getResourceAsStream(NdependRulesDefinition.RULES_RESOURCE);
     } else {
-      LOG.info("Loading rules from {}", rulesUrl);
-      FileSystemManager vfs = VFS.getManager();
-      FileObject rules = vfs.resolveFile(rulesUrl);
-      in = rules.getContent().getInputStream();
+      LOG.info("Loading rules from {}", rulesFile);
+      in = new FileInputStream(rulesFile);
     }
     return IOUtils.toByteArray(in);
   }

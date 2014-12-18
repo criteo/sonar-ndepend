@@ -22,8 +22,7 @@ The following parameter must be configured in `sonar-project.properties`:
 The following parameters must be configured in `sonar-runner.properties`:
 
 * `sonar.ndepend.ndependPath`: path to `NDepend.Console.exe`.
-* `sonar.ndepend.rulesUri`: _(optional)_ an URI to a rules definition file.
-For instance: "file:///path/to/rules.xml", "http://example.com/rules.xml".
+* `sonar.ndepend.rulesPath`: _(optional)_ a path to a rules definition file.
 [RulesDefinitionXmlLoader](http://docs.sonarsource.org/latest/apidocs/org/sonar/api/server/rule/RulesDefinitionXmlLoader.html)
 is used to parse the XML.
 
@@ -42,7 +41,7 @@ You may use [convert.rb](script/rules_converter/convert.rb) to
 generate your own rules file from an existing `.ndproj` file.
 
 You can then replace the default rules using the
-`sonar.ndepend.rulesUri` parameter.
+`sonar.ndepend.rulesPath` parameter.
 
 When the plugin is loaded in the Sonar server, the rules are added to
 the 'NDepend - C#' repository.

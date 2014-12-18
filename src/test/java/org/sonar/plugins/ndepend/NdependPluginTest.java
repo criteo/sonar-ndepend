@@ -33,7 +33,7 @@ public class NdependPluginTest {
     assertThat(propertyKeys(new NdependPlugin().getExtensions())).containsOnly(
       "sonar.ndepend.solutionFile",
       "sonar.ndepend.ndependPath",
-      "sonar.ndepend.rulesUri");
+      "sonar.ndepend.rulesPath");
   }
 
   private static Set<String> propertyKeys(List extensions) {

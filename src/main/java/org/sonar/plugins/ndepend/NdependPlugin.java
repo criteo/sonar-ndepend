@@ -57,9 +57,9 @@ public class NdependPlugin extends SonarPlugin {
       .onQualifiers(Qualifiers.PROJECT)
       .build(),
 
-      PropertyDefinition.builder(NdependConfig.NDEPEND_RULES_URL_KEY)
-      .name("URI to a rules file")
-      .description("Eg. file:///path/to/rules.xml, http://example.com/rules.xml")
+      PropertyDefinition.builder(NdependConfig.NDEPEND_RULES_PATH_KEY)
+      .name("Path to a rules file")
+      .description("Eg. /path/to/rules.xml")
       .category(CATEGORY)
       .onlyOnQualifiers(Qualifiers.PROJECT)
       .build()

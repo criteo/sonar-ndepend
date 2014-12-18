@@ -37,7 +37,7 @@ public class NdependRulesDefinitionTest {
     Settings settings = mock(Settings.class);
     NdependRulesDefinition definition = new NdependRulesDefinition(new RulesDefinitionXmlLoader(), settings);
 
-    when(settings.getString(NdependConfig.NDEPEND_RULES_URL_KEY)).thenReturn(" ");
+    when(settings.getString(NdependConfig.NDEPEND_RULES_PATH_KEY)).thenReturn(" ");
 
     definition.define(context);
     Repository repo = context.repository(NdependConfig.REPOSITORY_KEY);

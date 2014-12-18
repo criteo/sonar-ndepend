@@ -33,7 +33,7 @@ public class NdependRulesFetcherTest {
   @Test
   public void testWhenNoSettings() throws IOException {
     Settings settings = mock(Settings.class);
-    when(settings.getString(NdependConfig.NDEPEND_RULES_URL_KEY)).thenReturn(" ");
+    when(settings.getString(NdependConfig.NDEPEND_RULES_PATH_KEY)).thenReturn(" ");
     NdependRulesFetcher rulesFetcher = new NdependRulesFetcher(settings);
     InputStream rulesFromPackage = getClass().getResourceAsStream(NdependRulesDefinition.RULES_RESOURCE);
     String rules = IOUtils.toString(rulesFromPackage);
@@ -43,9 +43,9 @@ public class NdependRulesFetcherTest {
 
   @Test
   public void testWhenSettingsIsSet() throws IOException {
-    String settingsUri = getClass().getResource(NdependRulesDefinition.RULES_RESOURCE).toString();
+    String settingsUri = getClass().getResource(NdependRulesDefinition.RULES_RESOURCE).getPath();
     Settings settings = mock(Settings.class);
-    when(settings.getString(NdependConfig.NDEPEND_RULES_URL_KEY)).thenReturn(settingsUri);
+    when(settings.getString(NdependConfig.NDEPEND_RULES_PATH_KEY)).thenReturn(settingsUri);
     NdependRulesFetcher fetcher = new NdependRulesFetcher(settings);
     InputStream rulesFromPackage = getClass().getResourceAsStream(NdependRulesDefinition.RULES_RESOURCE);
     String rules = IOUtils.toString(rulesFromPackage);
