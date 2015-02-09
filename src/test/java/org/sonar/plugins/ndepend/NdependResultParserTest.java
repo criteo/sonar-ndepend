@@ -34,8 +34,8 @@ public class NdependResultParserTest {
   public void getGroupAndRows() throws Exception {
     final NdependResultParser parser = NdependResultParser.fromFile(getTestDoc());
 
-    assertThat(parser.getGroups().getLength()).isEqualTo(2);
-    assertThat(parser.getGroupRows(parser.getGroups().item(0)).getLength()).isEqualTo(2);
+    assertThat(parser.getQueries().getLength()).isEqualTo(2);
+    assertThat(parser.getQueryRows(parser.getQueries().item(0)).getLength()).isEqualTo(2);
   }
 
   @Test

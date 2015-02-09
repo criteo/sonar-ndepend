@@ -54,27 +54,26 @@ public class NdependResultParser {
   }
 
   @VisibleForTesting
-  NodeList getGroups() throws XPathExpressionException {
+  NodeList getQueries() throws XPathExpressionException {
     return (NodeList) this.xpath.compile("/RuleResult/Group/Query").evaluate(this.doc,
       XPathConstants.NODESET);
   }
 
   @VisibleForTesting
-  NodeList getGroupRows(Node groupNode) throws XPathExpressionException {
-    return (NodeList) this.xpath.compile("Rows/Row").evaluate(groupNode, XPathConstants.NODESET);
+  NodeList getQueryRows(Node queryNode) throws XPathExpressionException {
+    return (NodeList) this.xpath.compile("Rows/Row").evaluate(queryNode, XPathConstants.NODESET);
   }
 
   public List<NdependIssue> parse() throws XPathExpressionException {
-    NodeList groups = this.getGroups();
-    for (int i = 0; i < groups.getLength(); i++) {
-      Node group = groups.item(i);
-      NodeList rows = this.getGroupRows(groups.item(i));
-      String ruleKey = ((Element) group).getAttribute("Name");
-      String ruleDesc = ((Element) group).getAttribute("FullName");
+    NodeList queries = this.getQueries();
+    for (int i = 0; i < queries.getLength(); i++) {
+      Node query = queries.item(i);
+      NodeList rows = this.getQueryRows(queries.item(i));
+      String ruleKey = ((Element) query).getAttribute("Name");
+      String ruleDesc = ((Element) query).getAttribute("FullName");
       for (int j = 0; j < rows.getLength(); j++) {
         Element row = (Element) rows.item(j);
         NodeList vals = row.getElementsByTagName("Val");
-
         File filePath = new File(((Element) vals.item(0)).getTextContent());
         int fileLine = Integer.parseInt(((Element) vals.item(1)).getTextContent());
         issueBuilder.add(new NdependIssue(ruleKey, ruleDesc, filePath, fileLine));
