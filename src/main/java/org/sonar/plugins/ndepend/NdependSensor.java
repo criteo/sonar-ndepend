@@ -25,13 +25,14 @@ import org.sonar.api.batch.SensorContext;
 import org.sonar.api.batch.fs.FilePredicate;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.rule.ActiveRules;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.config.Settings;
 import org.sonar.api.issue.Issuable;
 import org.sonar.api.issue.Issue;
+import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.resources.Project;
-import org.sonar.api.rule.RuleKey;
+import org.sonar.api.rules.ActiveRule;
+import org.sonar.api.rules.Rule;
 import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.plugins.ndepend.ndproj.CsProjectParseError;
@@ -51,13 +52,13 @@ public class NdependSensor implements Sensor {
   private final Settings settings;
   private final FileSystem fileSystem;
   private final ResourcePerspectives perspectives;
-  private final ActiveRules activeRules;
+  private RulesProfile profile;
 
-  public NdependSensor(Settings settings, FileSystem fileSystem, ResourcePerspectives perspectives, ActiveRules activeRules) {
+  public NdependSensor(Settings settings, FileSystem fileSystem, ResourcePerspectives perspectives, RulesProfile profile) {
     this.settings = settings;
     this.fileSystem = fileSystem;
     this.perspectives = perspectives;
-    this.activeRules = activeRules;
+    this.profile = profile;
   }
 
   private File getNdProjFile(FileSystem filesystem) {
@@ -98,7 +99,7 @@ public class NdependSensor implements Sensor {
     boolean shouldExecute;
     if (!hasFilesToAnalyze()) {
       shouldExecute = false;
-    } else if (activeRules.findByRepository(NdependConfig.REPOSITORY_KEY).isEmpty()) {
+    } else if (profile.getActiveRulesByRepository(NdependConfig.REPOSITORY_KEY).isEmpty()) {
       LOG.info("All NDepend rules are disabled, skipping its execution.");
       shouldExecute = false;
     } else {
@@ -133,9 +134,12 @@ public class NdependSensor implements Sensor {
           continue;
         }
         Issuable issuable = this.perspectives.as(Issuable.class, org.sonar.api.resources.File.create(file.relativePath()));
+        ActiveRule activeRule = profile.getActiveRule(NdependConfig.REPOSITORY_KEY, issue.getRuleKey());
+        Rule rule = activeRule.getRule();
         Issue sonarIssue = issuable.newIssueBuilder()
           .line(issue.getLine())
-          .ruleKey(RuleKey.of(NdependConfig.REPOSITORY_KEY, issue.getRuleKey()))
+          .message(rule.getName())
+          .ruleKey(rule.ruleKey())
           .build();
         issuable.addIssue(sonarIssue);
       } catch (IOException e) {
