@@ -25,12 +25,14 @@ public class NdependIssue {
 
   private final String ruleKey;
   private final String message;
+  private String codeUnitName;
   private final File file;
   private final int line;
 
-  public NdependIssue(String ruleKey, String message, @Nullable File file, @Nullable int line) {
+  public NdependIssue(String ruleKey, String message, @Nullable String codeUnitName, @Nullable File file, @Nullable int line) {
     this.ruleKey = ruleKey;
     this.message = message;
+    this.codeUnitName = codeUnitName;
     this.file = file;
     this.line = line;
   }
@@ -41,6 +43,10 @@ public class NdependIssue {
 
   public String getMessage() {
     return message;
+  }
+
+  public String getCodeUnitName() {
+    return codeUnitName;
   }
 
   public File getFile() {

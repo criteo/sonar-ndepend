@@ -19,6 +19,7 @@ package org.sonar.plugins.ndepend;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -71,12 +72,15 @@ public class NdependResultParser {
       NodeList rows = this.getQueryRows(queries.item(i));
       String ruleKey = ((Element) query).getAttribute("Name");
       String ruleDesc = ((Element) query).getAttribute("FullName");
+      String kindOfNode = StringUtils.trim(((Element) query).getAttribute("KindOfNode"));
       for (int j = 0; j < rows.getLength(); j++) {
         Element row = (Element) rows.item(j);
+        // Name of method that violates the rule:
+        String codeUnitName = "methods".equals(kindOfNode) ? row.getAttribute("Name") : null;
         NodeList vals = row.getElementsByTagName("Val");
         File filePath = new File(((Element) vals.item(0)).getTextContent());
         int fileLine = Integer.parseInt(((Element) vals.item(1)).getTextContent());
-        issueBuilder.add(new NdependIssue(ruleKey, ruleDesc, filePath, fileLine));
+        issueBuilder.add(new NdependIssue(ruleKey, ruleDesc, codeUnitName, filePath, fileLine));
       }
     }
     return issueBuilder.build();

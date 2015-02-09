@@ -18,6 +18,7 @@
 
 package org.sonar.plugins.ndepend;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
@@ -135,10 +136,13 @@ public class NdependSensor implements Sensor {
         }
         Issuable issuable = this.perspectives.as(Issuable.class, org.sonar.api.resources.File.create(file.relativePath()));
         ActiveRule activeRule = profile.getActiveRule(NdependConfig.REPOSITORY_KEY, issue.getRuleKey());
+        if (activeRule == null) {
+          continue;
+        }
         Rule rule = activeRule.getRule();
         Issue sonarIssue = issuable.newIssueBuilder()
           .line(issue.getLine())
-          .message(rule.getName())
+          .message(buildMessage(issue, rule))
           .ruleKey(rule.ruleKey())
           .build();
         issuable.addIssue(sonarIssue);
@@ -146,5 +150,22 @@ public class NdependSensor implements Sensor {
         LOG.error("Error computing path of {}", issue.getFile(), e);
       }
     }
+  }
+
+  /**
+   * Returns a message describing a violation.
+   * <p>
+   * For violations on methods, the name of the method is added to have a
+   * clearer message as the line of the violation points to the first non
+   * trivial statement of the method, and not to the declaration of the
+   * method.
+   * @param issue the detected violation
+   * @param rule the infringed rule
+   * @return a non-null String
+   */
+  private String buildMessage(NdependIssue issue, Rule rule) {
+    String codeUnitMessage = StringUtils.isEmpty(issue.getCodeUnitName()) ? "" : String.format("About %s:%n", issue.getCodeUnitName());
+    String message = codeUnitMessage + rule.getName();
+    return message;
   }
 }
